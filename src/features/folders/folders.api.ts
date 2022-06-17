@@ -1,16 +1,31 @@
-import {AxiosResponse} from "axios";
+import { AxiosResponse } from "axios";
 import axios from "../../axios";
-import { CreateFolderDTO, Folder } from "./folders.slice";
+import { APIMetaData } from "../../common/interfaces";
+import {
+  CreateFolderDTO,
+  Folder,
+  FolderFilter,
+  UpdateFolderDTO,
+} from "./folders.slice";
 
-export const fetchFolders = (): Promise<AxiosResponse<Folder[]>> => axios.get("/folders");
+export const fetchFolders = (
+  params: FolderFilter
+): Promise<AxiosResponse<{ metadata: APIMetaData; folders: Folder[] }>> =>
+  axios.get("/users/me/folders", { params });
 
-export const createFolder = (dto: CreateFolderDTO): Promise<AxiosResponse<Folder>> =>
-  axios.post("/folders", dto);
+export const createFolder = (
+  dto: CreateFolderDTO
+): Promise<AxiosResponse<{ folder: Folder }>> =>
+  axios.post("users/me/folders", dto);
 
-export const updateFolder = (id: number, dto: CreateFolderDTO): Promise<AxiosResponse<Folder>> =>
+export const updateFolder = (
+  id: number,
+  dto: UpdateFolderDTO
+): Promise<AxiosResponse<{ folder: Folder }>> =>
   axios.patch(`/folders/${id}`, dto);
 
-export const deleteFolder = (id: number): Promise<AxiosResponse> => axios.delete(`/folders/${id}`);
+export const deleteFolder = (id: number): Promise<AxiosResponse> =>
+  axios.delete(`/folders/${id}`);
 
 const foldersApi = {
   fetchFolders,

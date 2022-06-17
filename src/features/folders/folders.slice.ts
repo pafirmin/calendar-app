@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import {RootState} from "../../app/store";
+import { RootState } from "../../app/store";
 import foldersApi from "./folders.api";
 
 export interface Folder {
@@ -9,9 +9,17 @@ export interface Folder {
   user_id: number;
 }
 
+export interface FolderFilter {
+  page: number;
+  page_size: number;
+  sort: string;
+}
+
 export interface CreateFolderDTO {
   name: string;
 }
+
+export interface UpdateFolderDTO extends Partial<CreateFolderDTO> {}
 
 export interface FolderState {
   entities: Folder[];
@@ -23,11 +31,14 @@ const initialState: FolderState = {
   loading: false,
 };
 
-export const fetchFolders = createAsyncThunk("folders/fetch", async () => {
-  const res = await foldersApi.fetchFolders();
+export const fetchFolders = createAsyncThunk(
+  "folders/fetch",
+  async (params: FolderFilter) => {
+    const res = await foldersApi.fetchFolders(params);
 
-  return res.data;
-});
+    return res.data;
+  }
+);
 
 export const createFolder = createAsyncThunk(
   "folders/create",
@@ -40,7 +51,7 @@ export const createFolder = createAsyncThunk(
 
 export const updateFolder = createAsyncThunk(
   "folders/update",
-  async (payload: { id: number; dto: CreateFolderDTO }) => {
+  async (payload: { id: number; dto: UpdateFolderDTO }) => {
     const res = await foldersApi.updateFolder(payload.id, payload.dto);
 
     return res.data;
@@ -66,21 +77,23 @@ export const folderSlice = createSlice({
     builder
       .addCase(fetchFolders.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.entities = payload;
+        state.entities = payload.folders;
       })
       .addCase(fetchFolders.pending, (state) => {
         state.loading = true;
       })
       .addCase(createFolder.fulfilled, (state, { payload }) => {
-        state.entities.unshift(payload);
+        state.entities.unshift(payload.folder);
       })
       .addCase(updateFolder.fulfilled, (state, { payload }) => {
         state.entities = state.entities.map((folder) =>
-          folder.id === payload.id ? payload : folder
+          folder.id === payload.folder.id ? payload.folder : folder
         );
       })
       .addCase(deleteFolder.fulfilled, (state, { payload }) => {
-        state.entities = state.entities.filter((folder) => folder.id !== payload);
+        state.entities = state.entities.filter(
+          (folder) => folder.id !== payload
+        );
       });
   },
 });
