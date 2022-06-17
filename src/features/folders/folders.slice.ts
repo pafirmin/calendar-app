@@ -33,38 +33,54 @@ const initialState: FolderState = {
 
 export const fetchFolders = createAsyncThunk(
   "folders/fetch",
-  async (params: FolderFilter) => {
-    const res = await foldersApi.fetchFolders(params);
+  async (params: FolderFilter, { rejectWithValue }) => {
+    try {
+      const res = await foldersApi.fetchFolders(params);
 
-    return res.data;
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
   }
 );
 
 export const createFolder = createAsyncThunk(
   "folders/create",
-  async (dto: CreateFolderDTO) => {
-    const res = await foldersApi.createFolder(dto);
+  async (dto: CreateFolderDTO, { rejectWithValue }) => {
+    try {
+      const res = await foldersApi.createFolder(dto);
 
-    return res.data;
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
   }
 );
 
 export const updateFolder = createAsyncThunk(
   "folders/update",
-  async (payload: { id: number; dto: UpdateFolderDTO }) => {
-    const res = await foldersApi.updateFolder(payload.id, payload.dto);
+  async (payload: { id: number; dto: UpdateFolderDTO }, { rejectWithValue }) => {
+    try {
+      const res = await foldersApi.updateFolder(payload.id, payload.dto);
 
-    return res.data;
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
   }
 );
 
 export const deleteFolder = createAsyncThunk(
   "/folders/delete",
-  async (id: number) => {
-    const res = await foldersApi.deleteFolder(id);
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const res = await foldersApi.deleteFolder(id);
 
-    if (res.status === 200) {
-      return id;
+      if (res.status === 200) {
+        return id;
+      }
+    } catch (err) {
+      return rejectWithValue(err);
     }
   }
 );
@@ -82,6 +98,9 @@ export const folderSlice = createSlice({
       .addCase(fetchFolders.pending, (state) => {
         state.loading = true;
       })
+      .addCase(fetchFolders.rejected, (state) => {
+        state.loading = false;
+      })
       .addCase(createFolder.fulfilled, (state, { payload }) => {
         state.entities.unshift(payload.folder);
       })
@@ -94,7 +113,7 @@ export const folderSlice = createSlice({
         state.entities = state.entities.filter(
           (folder) => folder.id !== payload
         );
-      });
+      })
   },
 });
 
