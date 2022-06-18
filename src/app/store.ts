@@ -2,12 +2,14 @@ import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import folderReducer from "../features/folders/folders.slice";
 import tasksReducer from "../features/tasks/tasks.slice";
 import authReducer from "../features/auth/auth.slice";
+import alertsReducer from "../features/alerts/alerts.slice";
 
 export const store = configureStore({
   reducer: {
     folders: folderReducer,
     tasks: tasksReducer,
     auth: authReducer,
+    alerts: alertsReducer,
   },
 });
 

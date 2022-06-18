@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import {RootState} from "../../app/store";
+import { RootState } from "../../app/store";
 import tasksApi from "./tasks.api";
 
 export enum TaskStatus {
   PENDING = "pending",
+  URGENT = "urgent",
   CANCELLED = "cancelled",
 }
 
@@ -60,8 +61,8 @@ export const fetchTasksByFolder = createAsyncThunk(
 
 export const createTask = createAsyncThunk(
   "tasks/create",
-  async (payload: { folderId: number; dto: CreateTaskDTO }) => {
-    const res = await tasksApi.createTask(payload.folderId, payload.dto);
+  async (payload: { folderId: number; body: CreateTaskDTO }) => {
+    const res = await tasksApi.createTask(payload.folderId, payload.body);
 
     return res.data;
   }
@@ -69,8 +70,8 @@ export const createTask = createAsyncThunk(
 
 export const updateTask = createAsyncThunk(
   "tasks/update",
-  async (payload: { id: number; dto: UpdateTaskDTO }) => {
-    const res = await tasksApi.updateTask(payload.id, payload.dto);
+  async (payload: { id: number; body: UpdateTaskDTO }) => {
+    const res = await tasksApi.updateTask(payload.id, payload.body);
 
     return res.data;
   }

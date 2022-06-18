@@ -23,64 +23,50 @@ export interface UpdateFolderDTO extends Partial<CreateFolderDTO> {}
 
 export interface FolderState {
   entities: Folder[];
+  active?: Folder;
   loading: boolean;
 }
 
 const initialState: FolderState = {
   entities: [],
+  active: undefined,
   loading: false,
 };
 
 export const fetchFolders = createAsyncThunk(
   "folders/fetch",
-  async (params: FolderFilter, { rejectWithValue }) => {
-    try {
-      const res = await foldersApi.fetchFolders(params);
+  async (params: FolderFilter) => {
+    const res = await foldersApi.fetchFolders(params);
 
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(err);
-    }
+    return res.data;
   }
 );
 
 export const createFolder = createAsyncThunk(
   "folders/create",
-  async (dto: CreateFolderDTO, { rejectWithValue }) => {
-    try {
-      const res = await foldersApi.createFolder(dto);
+  async (body: CreateFolderDTO) => {
+    const res = await foldersApi.createFolder(body);
 
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(err);
-    }
+    return res.data;
   }
 );
 
 export const updateFolder = createAsyncThunk(
   "folders/update",
-  async (payload: { id: number; dto: UpdateFolderDTO }, { rejectWithValue }) => {
-    try {
-      const res = await foldersApi.updateFolder(payload.id, payload.dto);
+  async (payload: { id: number; body: UpdateFolderDTO }) => {
+    const res = await foldersApi.updateFolder(payload.id, payload.body);
 
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(err);
-    }
+    return res.data;
   }
 );
 
 export const deleteFolder = createAsyncThunk(
   "/folders/delete",
-  async (id: number, { rejectWithValue }) => {
-    try {
-      const res = await foldersApi.deleteFolder(id);
+  async (id: number) => {
+    const res = await foldersApi.deleteFolder(id);
 
-      if (res.status === 200) {
-        return id;
-      }
-    } catch (err) {
-      return rejectWithValue(err);
+    if (res.status === 200) {
+      return id;
     }
   }
 );
@@ -94,6 +80,7 @@ export const folderSlice = createSlice({
       .addCase(fetchFolders.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.entities = payload.folders;
+        state.active = payload.folders[0];
       })
       .addCase(fetchFolders.pending, (state) => {
         state.loading = true;
@@ -113,7 +100,7 @@ export const folderSlice = createSlice({
         state.entities = state.entities.filter(
           (folder) => folder.id !== payload
         );
-      })
+      });
   },
 });
 

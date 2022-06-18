@@ -9,9 +9,9 @@ export const login = (
 };
 
 export const createUser = (
-  dto: CreateUserDTO
+  body: CreateUserDTO
 ): Promise<AxiosResponse<{ user: User }>> => {
-  return axios.post("/users", dto);
+  return axios.post("/users", body);
 };
 
 export const fetchUser = (): Promise<AxiosResponse<{ user: User }>> => {

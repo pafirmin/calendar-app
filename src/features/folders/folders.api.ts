@@ -14,15 +14,15 @@ export const fetchFolders = (
   axios.get("/users/me/folders", { params });
 
 export const createFolder = (
-  dto: CreateFolderDTO
+  body: CreateFolderDTO
 ): Promise<AxiosResponse<{ folder: Folder }>> =>
-  axios.post("users/me/folders", dto);
+  axios.post("users/me/folders", body);
 
 export const updateFolder = (
   id: number,
-  dto: UpdateFolderDTO
+  body: UpdateFolderDTO
 ): Promise<AxiosResponse<{ folder: Folder }>> =>
-  axios.patch(`/folders/${id}`, dto);
+  axios.patch(`/folders/${id}`, body);
 
 export const deleteFolder = (id: number): Promise<AxiosResponse> =>
   axios.delete(`/folders/${id}`);

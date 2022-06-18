@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import authApi from "../auth.api";
+import authApi from "./auth.api";
 
 export interface User {
   id: number;
@@ -21,24 +21,26 @@ export interface CreateUserDTO {
 }
 
 export interface AuthState {
-  isAuthenticated: boolean;
+  token: string | null;
   user: User | null;
 }
 
+const token = localStorage.getItem('access_token')
+
 const initialState: AuthState = {
-  isAuthenticated: false,
+  token: token,
   user: null,
 };
 
-const login = createAsyncThunk("auth/login", async (creds: Credentials) => {
+export const login = createAsyncThunk("auth/login", async (creds: Credentials) => {
   const res = await authApi.login(creds);
 
-  localStorage.setItem('access_token', JSON.stringify(res.data.token));
+  localStorage.setItem('access_token', res.data.token);
 
   return res.data;
 });
 
-const fetchUser = createAsyncThunk("auth/fetch", async () => {
+export const fetchUser = createAsyncThunk("auth/fetch", async () => {
   const res = await authApi.fetchUser();
 
   return res.data;
@@ -49,18 +51,17 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      state.isAuthenticated = false;
+      state.token = null;
       state.user = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state, { payload }) => {
-        state.isAuthenticated = true;
+        state.token = payload.token;
         state.user = payload.user;
       })
       .addCase(fetchUser.fulfilled, (state, { payload }) => {
-        state.isAuthenticated = true;
         state.user = payload.user;
       });
   },

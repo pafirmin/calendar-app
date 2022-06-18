@@ -11,14 +11,14 @@ const fetchTasksByFolder = async (
 
 const createTask = async (
   folderId: number,
-  dto: CreateTaskDTO
+  body: CreateTaskDTO
 ): Promise<AxiosResponse<{ task: Task }>> =>
-  axios.post(`folders/${folderId}/tasks`, dto);
+  axios.post(`folders/${folderId}/tasks`, body);
 
 const updateTask = async (
   id: number,
-  dto: UpdateTaskDTO
-): Promise<AxiosResponse<{ task: Task }>> => axios.patch(`/tasks/${id}`, dto);
+  body: UpdateTaskDTO
+): Promise<AxiosResponse<{ task: Task }>> => axios.patch(`/tasks/${id}`, body);
 
 const deleteTask = async (id: number): Promise<AxiosResponse> =>
   axios.delete(`/tasks/${id}`);
