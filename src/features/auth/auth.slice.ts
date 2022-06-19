@@ -25,19 +25,27 @@ export interface AuthState {
   user: User | null;
 }
 
-const token = localStorage.getItem('access_token')
+const token = localStorage.getItem("access_token");
 
 const initialState: AuthState = {
   token: token,
   user: null,
 };
 
-export const login = createAsyncThunk("auth/login", async (creds: Credentials) => {
-  const res = await authApi.login(creds);
+export const login = createAsyncThunk<
+  { user: User; access_token: string },
+  Credentials,
+  { rejectValue: any }
+>("auth/login", async (creds: Credentials, { rejectWithValue }) => {
+  try {
+    const res = await authApi.login(creds);
 
-  localStorage.setItem('access_token', res.data.token);
+    localStorage.setItem("access_token", res.data.access_token);
 
-  return res.data;
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err);
+  }
 });
 
 export const fetchUser = createAsyncThunk("auth/fetch", async () => {
@@ -58,7 +66,7 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state, { payload }) => {
-        state.token = payload.token;
+        state.token = payload.access_token;
         state.user = payload.user;
       })
       .addCase(fetchUser.fulfilled, (state, { payload }) => {

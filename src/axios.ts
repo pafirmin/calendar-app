@@ -8,12 +8,16 @@ const axios = Axios.create({
   },
 });
 
+axios.defaults.baseURL = "http://localhost:4000/api/v1";
+
 axios.interceptors.request.use((config) => {
   const accessToken = localStorage.getItem("access_token");
 
-  if (config.headers && accessToken) {
+  if (config && config.headers && accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
+
+  return config;
 });
 
 axios.interceptors.response.use(
@@ -24,12 +28,16 @@ axios.interceptors.response.use(
         case 401:
           store.dispatch(logout());
           localStorage.clear();
-          return Promise.reject(error.response.data);
+          break;
         default:
-          return Promise.reject(error.response.data);
+          break;
       }
-    }
 
+      return Promise.reject({
+        status: error.response.status,
+        message: error.response.data.message,
+      });
+    }
     return Promise.reject({ message: error.message });
   }
 );

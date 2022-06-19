@@ -1,20 +1,25 @@
-import { PropsWithChildren, useEffect } from "react";
+import { ReactElement, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchUser } from "./auth.slice";
 
-const RequireAuth = ({ children }: PropsWithChildren) => {
+interface Props {
+  children: ReactElement;
+}
+
+const RequireAuth = ({ children }: Props) => {
   const { user, token } = useAppSelector(({ auth }) => auth);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user && !token) {
+      navigate("/login");
+    }
     if (!user) {
       dispatch(fetchUser());
     }
-  }, [user, dispatch]);
-
-  if (!user && !token) {
-    return null;
-  }
+  }, [user, token, navigate, dispatch]);
 
   return children;
 };

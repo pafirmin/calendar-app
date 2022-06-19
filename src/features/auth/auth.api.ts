@@ -1,10 +1,10 @@
 import { AxiosResponse } from "axios";
-import axios from "../axios";
-import { CreateUserDTO, Credentials, User } from "./auth/auth.slice";
+import axios from "../../axios";
+import { CreateUserDTO, Credentials, User } from "./auth.slice";
 
 export const login = (
   credentials: Credentials
-): Promise<AxiosResponse<{ token: string; user: User }>> => {
+): Promise<AxiosResponse<{ access_token: string; user: User }>> => {
   return axios.post("/auth/login", credentials);
 };
 
