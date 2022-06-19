@@ -2,7 +2,7 @@ import folderReducer, { FolderState, deleteFolder } from "./folders.slice";
 
 describe("folder reducer", () => {
   const initialState: FolderState = {
-    entities: [],
+    folders: [],
     loading: false,
   };
 

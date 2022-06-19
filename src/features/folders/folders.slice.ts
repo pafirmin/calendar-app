@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import foldersApi from "./folders.api";
 
@@ -22,20 +22,20 @@ export interface CreateFolderDTO {
 export interface UpdateFolderDTO extends Partial<CreateFolderDTO> {}
 
 export interface FolderState {
-  entities: Folder[];
-  active?: Folder;
+  folders: Folder[];
   loading: boolean;
+  activeFolderId?: number;
 }
 
 const initialState: FolderState = {
-  entities: [],
-  active: undefined,
+  folders: [],
   loading: false,
+  activeFolderId: undefined,
 };
 
 export const fetchFolders = createAsyncThunk(
   "folders/fetch",
-  async (params: FolderFilter) => {
+  async (params?: FolderFilter) => {
     const res = await foldersApi.fetchFolders(params);
 
     return res.data;
@@ -74,13 +74,17 @@ export const deleteFolder = createAsyncThunk(
 export const folderSlice = createSlice({
   name: "folders",
   initialState,
-  reducers: {},
+  reducers: {
+    setActiveFolder: (state, action: PayloadAction<number>) => {
+      state.activeFolderId = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchFolders.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.entities = payload.folders;
-        state.active = payload.folders[0];
+        state.folders = payload.folders;
+        state.activeFolderId = payload.folders[0]?.id;
       })
       .addCase(fetchFolders.pending, (state) => {
         state.loading = true;
@@ -89,21 +93,26 @@ export const folderSlice = createSlice({
         state.loading = false;
       })
       .addCase(createFolder.fulfilled, (state, { payload }) => {
-        state.entities.unshift(payload.folder);
+        state.folders.unshift(payload.folder);
       })
       .addCase(updateFolder.fulfilled, (state, { payload }) => {
-        state.entities = state.entities.map((folder) =>
+        state.folders = state.folders.map((folder) =>
           folder.id === payload.folder.id ? payload.folder : folder
         );
       })
       .addCase(deleteFolder.fulfilled, (state, { payload }) => {
-        state.entities = state.entities.filter(
+        state.folders = state.folders.filter(
           (folder) => folder.id !== payload
         );
       });
   },
 });
 
-export const selectFolders = (state: RootState) => state.folders.entities;
+export const { setActiveFolder } = folderSlice.actions;
+
+export const selectFolders = (state: RootState) => state.folders.folders;
+
+export const selectActiveFolder = (state: RootState) =>
+  state.folders.folders.find((f) => f.id === state.folders.activeFolderId);
 
 export default folderSlice.reducer;

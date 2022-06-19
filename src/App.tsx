@@ -2,6 +2,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Alerts from "./features/alerts/Alerts";
 import Login from "./features/auth/Login";
 import RequireAuth from "./features/auth/RequireAuth";
+import FolderList from "./features/folders/FolderList";
+import TasksList from "./features/tasks/TasksList";
 
 function App() {
   return (
@@ -14,7 +16,8 @@ function App() {
             path="/"
             element={
               <RequireAuth>
-                <p>Welcome</p>
+                <FolderList />
+                <TasksList />
               </RequireAuth>
             }
           />

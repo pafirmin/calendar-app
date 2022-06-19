@@ -38,18 +38,18 @@ export interface UpdateTaskDTO extends Partial<CreateTaskDTO> {
 }
 
 export interface TaskState {
-  entities: Task[];
+  tasks: Task[];
   loading: boolean;
 }
 
 const initialState: TaskState = {
-  entities: [],
+  tasks: [],
   loading: false,
 };
 
 export const fetchTasksByFolder = createAsyncThunk(
   "tasks/fetch",
-  async (payload: { folderId: number; params: TaskFilter }) => {
+  async (payload: { folderId: number; params?: TaskFilter }) => {
     const res = await tasksApi.fetchTasksByFolder(
       payload.folderId,
       payload.params
@@ -96,25 +96,25 @@ const taskSlice = createSlice({
     builder
       .addCase(fetchTasksByFolder.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.entities = payload.tasks;
+        state.tasks = payload.tasks;
       })
       .addCase(fetchTasksByFolder.pending, (state) => {
         state.loading = true;
       })
       .addCase(createTask.fulfilled, (state, { payload }) => {
-        state.entities.unshift(payload.task);
+        state.tasks.unshift(payload.task);
       })
       .addCase(updateTask.fulfilled, (state, { payload }) => {
-        state.entities = state.entities.map((task) =>
+        state.tasks = state.tasks.map((task) =>
           task.id === payload.task.id ? payload.task : task
         );
       })
       .addCase(deleteTask.fulfilled, (state, { payload }) => {
-        state.entities = state.entities.filter((task) => task.id !== payload);
+        state.tasks = state.tasks.filter((task) => task.id !== payload);
       });
   },
 });
 
-export const selectTask = (state: RootState) => state.tasks.entities;
+export const selectTasks = (state: RootState) => state.tasks.tasks;
 
 export default taskSlice.reducer;

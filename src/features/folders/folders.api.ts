@@ -9,7 +9,7 @@ import {
 } from "./folders.slice";
 
 export const fetchFolders = (
-  params: FolderFilter
+  params?: FolderFilter
 ): Promise<AxiosResponse<{ metadata: APIMetaData; folders: Folder[] }>> =>
   axios.get("/users/me/folders", { params });
 

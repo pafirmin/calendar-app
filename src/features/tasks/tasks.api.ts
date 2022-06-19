@@ -5,7 +5,7 @@ import { CreateTaskDTO, Task, TaskFilter, UpdateTaskDTO } from "./tasks.slice";
 
 const fetchTasksByFolder = async (
   folderId: number,
-  params: TaskFilter
+  params?: TaskFilter
 ): Promise<AxiosResponse<{ metadata: APIMetaData; tasks: Task[] }>> =>
   axios.get(`folders/${folderId}/tasks`, { params });
 

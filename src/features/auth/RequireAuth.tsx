@@ -1,10 +1,10 @@
-import { ReactElement, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchUser } from "./auth.slice";
 
 interface Props {
-  children: ReactElement;
+  children: ReactNode;
 }
 
 const RequireAuth = ({ children }: Props) => {
@@ -21,7 +21,7 @@ const RequireAuth = ({ children }: Props) => {
     }
   }, [user, token, navigate, dispatch]);
 
-  return children;
+  return <>{children}</>;
 };
 
 export default RequireAuth;
