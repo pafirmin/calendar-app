@@ -62,14 +62,24 @@ export const createFolder = createAsyncThunk<
   }
 });
 
-export const updateFolder = createAsyncThunk(
-  "folders/update",
-  async (payload: { id: number; body: UpdateFolderDTO }) => {
+export const updateFolder = createAsyncThunk<
+  { folder: Folder },
+  { id: number; body: UpdateFolderDTO },
+  { rejectValue: FieldErrors<UpdateFolderDTO> }
+>("folders/update", async (payload, { rejectWithValue }) => {
+  try {
     const res = await foldersApi.updateFolder(payload.id, payload.body);
 
     return res.data;
+  } catch (err: any) {
+    switch (err.status) {
+      case 400:
+        return rejectWithValue(err as FieldErrors<UpdateFolderDTO>);
+      default:
+        throw err;
+    }
   }
-);
+});
 
 export const deleteFolder = createAsyncThunk(
   "/folders/delete",
@@ -86,8 +96,8 @@ export const folderSlice = createSlice({
   name: "folders",
   initialState,
   reducers: {
-    setActiveFolder: (state, action: PayloadAction<number>) => {
-      state.activeFolderId = action.payload;
+    setActiveFolder: (state, { payload }: PayloadAction<number>) => {
+      state.activeFolderId = payload;
     },
     setFilters: (state, { payload }: PayloadAction<FolderFilter>) => {
       state.filter = omitBy<FolderFilter>(
@@ -110,7 +120,8 @@ export const folderSlice = createSlice({
         state.loading = false;
       })
       .addCase(createFolder.fulfilled, (state, { payload }) => {
-        state.folders.unshift(payload.folder);
+        const i = state.folders.findIndex((f) => f.name > payload.folder.name)
+        state.folders.splice(i, 0, payload.folder)
       })
       .addCase(updateFolder.fulfilled, (state, { payload }) => {
         state.folders = state.folders.map((folder) =>

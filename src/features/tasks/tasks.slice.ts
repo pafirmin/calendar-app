@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { omitBy, isNil } from "lodash";
 import { RootState } from "../../app/store";
-import {BaseAPIQuery} from "../../common/interfaces";
+import { BaseAPIQuery } from "../../common/interfaces";
 import { FieldErrors } from "../../common/types";
 import tasksApi from "./tasks.api";
 
@@ -80,14 +80,24 @@ export const createTask = createAsyncThunk<
   }
 });
 
-export const updateTask = createAsyncThunk(
-  "tasks/update",
-  async (payload: { id: number; body: UpdateTaskDTO }) => {
+export const updateTask = createAsyncThunk<
+  { task: Task },
+  { id: number; body: UpdateTaskDTO },
+  { rejectValue: FieldErrors<UpdateTaskDTO> }
+>("tasks/update", async (payload, { rejectWithValue }) => {
+  try {
     const res = await tasksApi.updateTask(payload.id, payload.body);
 
     return res.data;
+  } catch (err: any) {
+    switch (err.status) {
+      case 400:
+        return rejectWithValue(err.errors as FieldErrors<UpdateTaskDTO>);
+      default:
+        throw err;
+    }
   }
-);
+});
 
 export const deleteTask = createAsyncThunk(
   "tasks/delete",
