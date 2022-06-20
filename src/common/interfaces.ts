@@ -5,3 +5,9 @@ export interface APIMetaData {
   last_page: number;
   total_records: number;
 }
+
+export interface BaseAPIQuery<T> {
+  page?: number;
+  page_size?: number;
+  sort?: keyof T
+};

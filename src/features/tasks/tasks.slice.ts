@@ -1,5 +1,8 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { omitBy, isNil } from "lodash";
 import { RootState } from "../../app/store";
+import {BaseAPIQuery} from "../../common/interfaces";
+import { FieldErrors } from "../../common/types";
 import tasksApi from "./tasks.api";
 
 export enum TaskStatus {
@@ -18,13 +21,10 @@ export interface Task {
   folder_id: string;
 }
 
-export interface TaskFilter {
-  status: TaskStatus;
-  min_date: string;
-  max_date: string;
-  page: number;
-  page_size: number;
-  sort: string;
+export interface TaskFilter extends BaseAPIQuery<Task> {
+  status?: TaskStatus;
+  min_date?: string;
+  max_date?: string;
 }
 
 export interface CreateTaskDTO {
@@ -39,34 +39,46 @@ export interface UpdateTaskDTO extends Partial<CreateTaskDTO> {
 
 export interface TaskState {
   tasks: Task[];
+  filter: TaskFilter;
   loading: boolean;
 }
 
 const initialState: TaskState = {
   tasks: [],
+  filter: {
+    min_date: new Date().toISOString(),
+  },
   loading: false,
 };
 
 export const fetchTasksByFolder = createAsyncThunk(
   "tasks/fetch",
-  async (payload: { folderId: number; params?: TaskFilter }) => {
-    const res = await tasksApi.fetchTasksByFolder(
-      payload.folderId,
-      payload.params
-    );
+  async (payload: number, { getState }) => {
+    const { tasks } = getState() as { tasks: TaskState };
+    const res = await tasksApi.fetchTasksByFolder(payload, tasks.filter);
 
     return res.data;
   }
 );
 
-export const createTask = createAsyncThunk(
-  "tasks/create",
-  async (payload: { folderId: number; body: CreateTaskDTO }) => {
+export const createTask = createAsyncThunk<
+  { task: Task },
+  { folderId: number; body: CreateTaskDTO },
+  { rejectValue: FieldErrors<CreateTaskDTO> }
+>("tasks/create", async (payload, { rejectWithValue }) => {
+  try {
     const res = await tasksApi.createTask(payload.folderId, payload.body);
 
     return res.data;
+  } catch (err: any) {
+    switch (err.status) {
+      case 400:
+        return rejectWithValue(err.errors as FieldErrors<CreateTaskDTO>);
+      default:
+        throw err;
+    }
   }
-);
+});
 
 export const updateTask = createAsyncThunk(
   "tasks/update",
@@ -80,18 +92,23 @@ export const updateTask = createAsyncThunk(
 export const deleteTask = createAsyncThunk(
   "tasks/delete",
   async (id: number) => {
-    const res = await tasksApi.deleteTask(id);
+    await tasksApi.deleteTask(id);
 
-    if (res.status === 200) {
-      return id;
-    }
+    return id;
   }
 );
 
 const taskSlice = createSlice({
   name: "tasks",
   initialState,
-  reducers: {},
+  reducers: {
+    setFilters: (state, { payload }: PayloadAction<TaskFilter>) => {
+      state.filter = omitBy<TaskFilter>(
+        Object.assign(state.filter, payload),
+        isNil
+      );
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasksByFolder.fulfilled, (state, { payload }) => {
@@ -100,6 +117,9 @@ const taskSlice = createSlice({
       })
       .addCase(fetchTasksByFolder.pending, (state) => {
         state.loading = true;
+      })
+      .addCase(fetchTasksByFolder.rejected, (state) => {
+        state.loading = false;
       })
       .addCase(createTask.fulfilled, (state, { payload }) => {
         state.tasks.unshift(payload.task);
@@ -114,6 +134,8 @@ const taskSlice = createSlice({
       });
   },
 });
+
+export const { setFilters } = taskSlice.actions;
 
 export const selectTasks = (state: RootState) => state.tasks.tasks;
 

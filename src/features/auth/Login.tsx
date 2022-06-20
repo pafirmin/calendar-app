@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Stack, TextField } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
@@ -8,6 +8,8 @@ import { Credentials, login } from "./auth.slice";
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const AUTH_FAIL_MESSAGE = "Incorrect username or password.";
+  const [message, setMessage] = useState<string>("");
   const [values, setValues] = useState<Credentials>({
     email: "",
     password: "",
@@ -28,8 +30,7 @@ const Login = () => {
 
     switch (response.payload.status) {
       case 401:
-        dispatch(showError("Invalid credentials"));
-        console.log("Unauthorised");
+        setMessage(AUTH_FAIL_MESSAGE);
         break;
       default:
         dispatch(showError(response.payload.message));
@@ -38,15 +39,18 @@ const Login = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit}>
+      <Typography align="center">{message}</Typography>
       <Stack spacing={2}>
         <TextField
-          type="text"
+          required
+          type="email"
           label="Email"
           name="email"
           value={values.email}
           onChange={handleChange}
         />
         <TextField
+          required
           type="password"
           label="Password"
           name="password"

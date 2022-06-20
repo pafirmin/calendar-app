@@ -36,7 +36,7 @@ export const login = createAsyncThunk<
   { user: User; access_token: string },
   Credentials,
   { rejectValue: any }
->("auth/login", async (creds: Credentials, { rejectWithValue }) => {
+>("auth/login", async (creds, { rejectWithValue }) => {
   try {
     const res = await authApi.login(creds);
 

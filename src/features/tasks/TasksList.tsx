@@ -7,14 +7,14 @@ import { fetchTasksByFolder } from "./tasks.slice";
 
 const TasksList = () => {
   const dispatch = useAppDispatch();
-  const { tasks } = useAppSelector(({ tasks }) => tasks);
   const activeFolder = useAppSelector(selectActiveFolder);
+  const { tasks, filter } = useAppSelector(({ tasks }) => tasks);
 
   useEffect(() => {
     if (activeFolder) {
-      dispatch(fetchTasksByFolder({ folderId: activeFolder.id }));
+      dispatch(fetchTasksByFolder(activeFolder.id));
     }
-  }, [activeFolder, dispatch]);
+  }, [activeFolder, filter, dispatch]);
 
   return (
     <List>

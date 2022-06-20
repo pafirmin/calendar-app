@@ -1,5 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { isNil, omitBy } from "lodash";
 import { RootState } from "../../app/store";
+import { BaseAPIQuery } from "../../common/interfaces";
+import { FieldErrors } from "../../common/types";
 import foldersApi from "./folders.api";
 
 export interface Folder {
@@ -9,11 +12,7 @@ export interface Folder {
   user_id: number;
 }
 
-export interface FolderFilter {
-  page: number;
-  page_size: number;
-  sort: string;
-}
+export interface FolderFilter extends BaseAPIQuery<Folder> {}
 
 export interface CreateFolderDTO {
   name: string;
@@ -23,12 +22,14 @@ export interface UpdateFolderDTO extends Partial<CreateFolderDTO> {}
 
 export interface FolderState {
   folders: Folder[];
+  filter: FolderFilter;
   loading: boolean;
   activeFolderId?: number;
 }
 
 const initialState: FolderState = {
   folders: [],
+  filter: { sort: "name" },
   loading: false,
   activeFolderId: undefined,
 };
@@ -42,14 +43,24 @@ export const fetchFolders = createAsyncThunk(
   }
 );
 
-export const createFolder = createAsyncThunk(
-  "folders/create",
-  async (body: CreateFolderDTO) => {
+export const createFolder = createAsyncThunk<
+  { folder: Folder },
+  CreateFolderDTO,
+  { rejectValue: FieldErrors<CreateFolderDTO> }
+>("folders/create", async (body, { rejectWithValue }) => {
+  try {
     const res = await foldersApi.createFolder(body);
 
     return res.data;
+  } catch (err: any) {
+    switch (err.status) {
+      case 400:
+        return rejectWithValue(err as FieldErrors<CreateFolderDTO>);
+      default:
+        throw err;
+    }
   }
-);
+});
 
 export const updateFolder = createAsyncThunk(
   "folders/update",
@@ -78,6 +89,12 @@ export const folderSlice = createSlice({
     setActiveFolder: (state, action: PayloadAction<number>) => {
       state.activeFolderId = action.payload;
     },
+    setFilters: (state, { payload }: PayloadAction<FolderFilter>) => {
+      state.filter = omitBy<FolderFilter>(
+        Object.assign(state.filter, payload),
+        isNil
+      );
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -101,9 +118,7 @@ export const folderSlice = createSlice({
         );
       })
       .addCase(deleteFolder.fulfilled, (state, { payload }) => {
-        state.folders = state.folders.filter(
-          (folder) => folder.id !== payload
-        );
+        state.folders = state.folders.filter((folder) => folder.id !== payload);
       });
   },
 });
