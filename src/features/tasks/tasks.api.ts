@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import axios from "../../axios";
 import { APIMetaData } from "../../common/interfaces";
+import {TasksAPI} from "./interfaces";
 import { CreateTaskDTO, Task, TaskFilter, UpdateTaskDTO } from "./tasks.slice";
 
 const fetchTasksByFolder = async (
@@ -23,7 +24,7 @@ const updateTask = async (
 const deleteTask = async (id: number): Promise<AxiosResponse> =>
   axios.delete(`/tasks/${id}`);
 
-const tasksApi = {
+const tasksApi: TasksAPI = {
   fetchTasksByFolder,
   createTask,
   updateTask,

@@ -1,4 +1,5 @@
 import Axios from "axios";
+import {StatusCodes} from "http-status-codes";
 import { store } from "./app/store";
 import { logout } from "./features/auth/auth.slice";
 
@@ -25,10 +26,13 @@ axios.interceptors.response.use(
   async (error) => {
     if (error.response) {
       switch (error.response.status) {
-        case 401:
+        case StatusCodes.UNAUTHORIZED:
           store.dispatch(logout());
           localStorage.clear();
           break;
+        case StatusCodes.IM_A_TEAPOT:
+          console.log("Brew your own.")
+          break
         default:
           break;
       }

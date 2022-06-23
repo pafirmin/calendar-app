@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import axios from "../../axios";
-import { CreateUserDTO, Credentials, User } from "./auth.slice";
+import {Credentials, User, CreateUserDTO, AuthAPI} from "./interfaces";
 
 export const login = (
   credentials: Credentials
@@ -18,7 +18,7 @@ export const fetchUser = (): Promise<AxiosResponse<{ user: User }>> => {
   return axios.get("/users/me");
 };
 
-const authApi = {
+const authApi: AuthAPI = {
   login,
   createUser,
   fetchUser,

@@ -1,5 +1,5 @@
 import { ListItem } from "@mui/material";
-import { Task as ITask } from "./tasks.slice";
+import { Task as ITask } from "./interfaces";
 
 interface Props {
   task: ITask;

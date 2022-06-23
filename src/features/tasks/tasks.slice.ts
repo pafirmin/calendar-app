@@ -1,47 +1,18 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { StatusCodes } from "http-status-codes";
 import { omitBy, isNil } from "lodash";
+import { AppAPI } from "../../app/api";
 import { RootState } from "../../app/store";
-import { BaseAPIQuery } from "../../common/interfaces";
+import { APIMetaData } from "../../common/interfaces";
 import { FieldErrors } from "../../common/types";
+import {
+  TaskState,
+  Task,
+  CreateTaskDTO,
+  UpdateTaskDTO,
+  TaskFilter,
+} from "./interfaces";
 import tasksApi from "./tasks.api";
-
-export enum TaskStatus {
-  PENDING = "pending",
-  URGENT = "urgent",
-  CANCELLED = "cancelled",
-}
-
-export interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  datetime: string;
-  created: string;
-  folder_id: string;
-}
-
-export interface TaskFilter extends BaseAPIQuery<Task> {
-  status?: TaskStatus;
-  min_date?: string;
-  max_date?: string;
-}
-
-export interface CreateTaskDTO {
-  title: string;
-  date: string;
-  description: string;
-}
-
-export interface UpdateTaskDTO extends Partial<CreateTaskDTO> {
-  status?: TaskStatus;
-}
-
-export interface TaskState {
-  tasks: Task[];
-  filter: TaskFilter;
-  loading: boolean;
-}
 
 const initialState: TaskState = {
   tasks: [],
@@ -51,15 +22,16 @@ const initialState: TaskState = {
   loading: false,
 };
 
-export const fetchTasksByFolder = createAsyncThunk(
-  "tasks/fetch",
-  async (payload: number, { getState }) => {
-    const { tasks } = getState() as { tasks: TaskState };
-    const res = await tasksApi.fetchTasksByFolder(payload, tasks.filter);
+export const fetchTasksByFolder = createAsyncThunk<
+  { metadata: APIMetaData; tasks: Task[] },
+  number,
+  { extra: AppAPI }
+>("tasks/fetch", async (payload: number, { getState, extra }) => {
+  const { tasks } = getState() as { tasks: TaskState };
+  const res = await extra.tasks.fetchTasksByFolder(payload, tasks.filter);
 
-    return res.data;
-  }
-);
+  return res.data;
+});
 
 export const createTask = createAsyncThunk<
   { task: Task },
@@ -72,7 +44,7 @@ export const createTask = createAsyncThunk<
     return res.data;
   } catch (err: any) {
     switch (err.status) {
-      case 400:
+      case StatusCodes.UNPROCESSABLE_ENTITY:
         return rejectWithValue(err.errors as FieldErrors<CreateTaskDTO>);
       default:
         throw err;
@@ -91,7 +63,7 @@ export const updateTask = createAsyncThunk<
     return res.data;
   } catch (err: any) {
     switch (err.status) {
-      case 400:
+      case StatusCodes.UNPROCESSABLE_ENTITY:
         return rejectWithValue(err.errors as FieldErrors<UpdateTaskDTO>);
       default:
         throw err;
@@ -99,10 +71,10 @@ export const updateTask = createAsyncThunk<
   }
 });
 
-export const deleteTask = createAsyncThunk(
+export const deleteTask = createAsyncThunk<number, number, { extra: AppAPI }>(
   "tasks/delete",
-  async (id: number) => {
-    await tasksApi.deleteTask(id);
+  async (id: number, { extra }) => {
+    await extra.tasks.deleteTask(id);
 
     return id;
   }

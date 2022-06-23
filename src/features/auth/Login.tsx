@@ -1,14 +1,17 @@
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { StatusCodes } from "http-status-codes";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
 import { showError } from "../alerts/alerts.slice";
-import { Credentials, login } from "./auth.slice";
+import { login } from "./auth.slice";
+import { Credentials } from "./interfaces";
+
+const AUTH_FAIL_MESSAGE = "Incorrect username or password.";
 
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const AUTH_FAIL_MESSAGE = "Incorrect username or password.";
   const [message, setMessage] = useState<string>("");
   const [values, setValues] = useState<Credentials>({
     email: "",
@@ -29,7 +32,7 @@ const Login = () => {
     }
 
     switch (response.payload.status) {
-      case 401:
+      case StatusCodes.UNAUTHORIZED:
         setMessage(AUTH_FAIL_MESSAGE);
         break;
       default:

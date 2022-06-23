@@ -7,6 +7,8 @@ import {
   FolderFilter,
   UpdateFolderDTO,
 } from "./folders.slice";
+import {FoldersAPI} from "./interfaces";
+
 
 export const fetchFolders = (
   params?: FolderFilter
@@ -27,7 +29,7 @@ export const updateFolder = (
 export const deleteFolder = (id: number): Promise<AxiosResponse> =>
   axios.delete(`/folders/${id}`);
 
-const foldersApi = {
+const foldersApi: FoldersAPI = {
   fetchFolders,
   createFolder,
   updateFolder,
