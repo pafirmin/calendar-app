@@ -6,7 +6,7 @@ import {
   Folder,
   FolderFilter,
   UpdateFolderDTO,
-} from "./folders.slice";
+} from "./interfaces";
 import {FoldersAPI} from "./interfaces";
 
 

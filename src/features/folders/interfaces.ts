@@ -17,10 +17,9 @@ export interface CreateFolderDTO {
 export interface UpdateFolderDTO extends Partial<CreateFolderDTO> {}
 
 export interface FolderState {
-  folders: Folder[];
-  filter: FolderFilter;
+  entities: Folder[];
   loading: boolean;
-  activeFolderId?: number;
+  selected: number[]
 }
 
 export interface FoldersAPI {
@@ -28,6 +27,7 @@ export interface FoldersAPI {
     f?: FolderFilter
   ) => Promise<AxiosResponse<{ metadata: APIMetaData; folders: Folder[] }>>;
   createFolder: (
+
     b: CreateFolderDTO
   ) => Promise<AxiosResponse<{ folder: Folder }>>;
   updateFolder: (

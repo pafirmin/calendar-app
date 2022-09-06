@@ -1,25 +1,51 @@
 import { List } from "@mui/material";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { selectActiveFolder } from "../folders/folders.slice";
+import { showError } from "../alerts/alerts.slice";
+import { useTasksFilter } from "./hooks";
 import Task from "./Task";
-import { fetchTasksByFolder } from "./tasks.slice";
+import { clearTasks, fetchTasks } from "./tasks.slice";
+import { addDays } from "date-fns";
+import { dateRange } from "../../common/utils";
 
 const TasksList = () => {
+  const today = useMemo(() => new Date(), []);
   const dispatch = useAppDispatch();
-  const activeFolder = useAppSelector(selectActiveFolder);
-  const { tasks, filter } = useAppSelector(({ tasks }) => tasks);
+  const selected = useAppSelector(({ folders }) => folders.selected);
+  const { entities: tasks } = useAppSelector(({ tasks }) => tasks);
+  const [taskFilter, setTaskFilter] = useTasksFilter({
+    min_date: today.toISOString().slice(0, 10),
+    max_date: addDays(today, 1).toISOString().slice(0, 10),
+  });
+  const dates = useMemo(
+    () =>
+      dateRange(
+        new Date(taskFilter.min_date as string),
+        new Date(taskFilter.max_date as string)
+      ),
+    [taskFilter.min_date, taskFilter.max_date]
+  );
+
+  const handleFetchTasks = useCallback(async () => {
+    try {
+      await dispatch(fetchTasks(taskFilter)).unwrap();
+    } catch (err: any) {
+      dispatch(showError(err.message));
+    }
+  }, [taskFilter, dispatch]);
 
   useEffect(() => {
-    if (activeFolder) {
-      dispatch(fetchTasksByFolder(activeFolder.id));
+    if (selected.length > 0) {
+      handleFetchTasks();
     }
-  }, [activeFolder, filter, dispatch]);
+
+    return () => void dispatch(clearTasks());
+  }, [dispatch, handleFetchTasks, selected.length]);
 
   return (
     <List>
       {tasks.map((task) => (
-        <Task task={task} />
+        <Task key={task.id} task={task} />
       ))}
     </List>
   );

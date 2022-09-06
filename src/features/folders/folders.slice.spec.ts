@@ -1,9 +1,9 @@
-import folderReducer, { FolderState, deleteFolder } from "./folders.slice";
+import { FolderState } from "./interfaces";
 
 describe("folder reducer", () => {
   const initialState: FolderState = {
-    filter: {},
-    folders: [],
+    selected: [],
+    entities: [],
     loading: false,
   };
 

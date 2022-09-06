@@ -22,7 +22,9 @@ axios.interceptors.request.use((config) => {
 });
 
 axios.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response
+  },
   async (error) => {
     if (error.response) {
       switch (error.response.status) {
@@ -31,7 +33,6 @@ axios.interceptors.response.use(
           localStorage.clear();
           break;
         case StatusCodes.IM_A_TEAPOT:
-          console.log("Brew your own.")
           break
         default:
           break;

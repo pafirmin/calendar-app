@@ -13,9 +13,9 @@ export const login = createAsyncThunk<
   { user: User; access_token: string },
   Credentials,
   { rejectValue: any; extra: AppAPI }
->("auth/login", async (creds, { rejectWithValue, extra }) => {
+>("auth/login", async (creds, { rejectWithValue, extra: api }) => {
   try {
-    const res = await extra.auth.login(creds);
+    const res = await api.auth.login(creds);
 
     localStorage.setItem("access_token", res.data.access_token);
 
@@ -29,8 +29,8 @@ export const fetchUser = createAsyncThunk<
   { user: User },
   undefined,
   { extra: AppAPI }
->("auth/fetch", async (_, { extra }) => {
-  const res = await extra.auth.fetchUser();
+>("auth/fetch", async (_, { extra: api }) => {
+  const res = await api.auth.fetchUser();
 
   return res.data;
 });

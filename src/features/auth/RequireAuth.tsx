@@ -15,8 +15,7 @@ const RequireAuth = ({ children }: Props) => {
   useEffect(() => {
     if (!user && !token) {
       navigate("/login");
-    }
-    if (!user) {
+    } else if (!user) {
       dispatch(fetchUser());
     }
   }, [user, token, navigate, dispatch]);

@@ -2,13 +2,12 @@ import { AxiosResponse } from "axios";
 import axios from "../../axios";
 import { APIMetaData } from "../../common/interfaces";
 import {TasksAPI} from "./interfaces";
-import { CreateTaskDTO, Task, TaskFilter, UpdateTaskDTO } from "./tasks.slice";
+import { CreateTaskDTO, Task, TaskFilter, UpdateTaskDTO } from "./interfaces";
 
-const fetchTasksByFolder = async (
-  folderId: number,
+const fetchTasks = async (
   params?: TaskFilter
 ): Promise<AxiosResponse<{ metadata: APIMetaData; tasks: Task[] }>> =>
-  axios.get(`folders/${folderId}/tasks`, { params });
+  axios.get(`/tasks`, { params });
 
 const createTask = async (
   folderId: number,
@@ -25,7 +24,7 @@ const deleteTask = async (id: number): Promise<AxiosResponse> =>
   axios.delete(`/tasks/${id}`);
 
 const tasksApi: TasksAPI = {
-  fetchTasksByFolder,
+  fetchTasks,
   createTask,
   updateTask,
   deleteTask,

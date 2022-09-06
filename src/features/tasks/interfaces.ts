@@ -1,6 +1,6 @@
-import {AxiosResponse} from "axios";
-import {APIMetaData, BaseAPIQuery} from "../../common/interfaces";
-import {TaskStatus} from "./enums";
+import { AxiosResponse } from "axios";
+import { APIMetaData, BaseAPIQuery } from "../../common/interfaces";
+import { TaskStatus } from "./enums";
 
 export interface Task {
   id: number;
@@ -15,6 +15,7 @@ export interface Task {
 
 export interface TaskFilter extends BaseAPIQuery<Task> {
   status?: TaskStatus;
+  folder_id?: number[];
   min_date?: string;
   max_date?: string;
 }
@@ -30,14 +31,13 @@ export interface UpdateTaskDTO extends Partial<CreateTaskDTO> {
 }
 
 export interface TaskState {
-  tasks: Task[];
-  filter: TaskFilter;
+  entities: Task[];
+  metadata: APIMetaData;
   loading: boolean;
 }
 
 export interface TasksAPI {
-  fetchTasksByFolder: (
-    id: number,
+  fetchTasks: (
     p: TaskFilter
   ) => Promise<AxiosResponse<{ metadata: APIMetaData; tasks: Task[] }>>;
   createTask: (

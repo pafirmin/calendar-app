@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Alerts from "./features/alerts/Alerts";
 import Login from "./features/auth/Login";
@@ -7,7 +8,7 @@ import TasksList from "./features/tasks/TasksList";
 
 function App() {
   return (
-    <div>
+    <Fragment>
       <Alerts />
       <BrowserRouter>
         <Routes>
@@ -23,7 +24,7 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
-    </div>
+    </Fragment>
   );
 }
 

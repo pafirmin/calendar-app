@@ -1,11 +1,13 @@
 import { List, MenuItem } from "@mui/material";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchFolders, setActiveFolder } from "./folders.slice";
+import { fetchFolders, toggleSelected } from "./folders.slice";
 
 const FolderList = () => {
   const dispatch = useAppDispatch();
-  const { folders, activeFolderId } = useAppSelector(({ folders }) => folders);
+  const { entities: folders, selected } = useAppSelector(
+    (state) => state.folders
+  );
 
   useEffect(() => {
     dispatch(fetchFolders());
@@ -16,8 +18,8 @@ const FolderList = () => {
       {folders.map((folder) => (
         <MenuItem
           key={folder.id}
-          selected={folder.id === activeFolderId}
-          onClick={() => dispatch(setActiveFolder(folder.id))}
+          selected={selected.includes(folder.id)}
+          onClick={() => dispatch(toggleSelected(folder))}
         >
           {folder.name}
         </MenuItem>
