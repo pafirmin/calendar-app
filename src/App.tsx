@@ -1,30 +1,27 @@
-import { Fragment } from "react";
+import { ThemeProvider } from "@emotion/react";
+import { CssBaseline } from "@mui/material";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Alerts from "./features/alerts/Alerts";
 import Login from "./features/auth/Login";
-import RequireAuth from "./features/auth/RequireAuth";
-import FolderList from "./features/folders/FolderList";
+import Layout from "./features/layout/Layout";
 import TasksList from "./features/tasks/TasksList";
+import theme from "./theme";
 
 function App() {
   return (
-    <Fragment>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Alerts />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/"
-            element={
-              <RequireAuth>
-                <FolderList />
-                <TasksList />
-              </RequireAuth>
-            }
-          />
+          <Route path="/" element={<Layout />}>
+            <Route index element={<TasksList />} />
+            <Route path="/calendar" element={<TasksList />} />
+          </Route>
         </Routes>
       </BrowserRouter>
-    </Fragment>
+    </ThemeProvider>
   );
 }
 

@@ -9,7 +9,7 @@ const axios = Axios.create({
   },
 });
 
-axios.defaults.baseURL = "http://localhost:4000/api/v1";
+axios.defaults.baseURL = process.env.REACT_APP_API_BASE;
 
 axios.interceptors.request.use((config) => {
   const accessToken = localStorage.getItem("access_token");

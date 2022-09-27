@@ -15,7 +15,7 @@ const TasksList = () => {
   const { entities: tasks } = useAppSelector(({ tasks }) => tasks);
   const [taskFilter, setTaskFilter] = useTasksFilter({
     min_date: today.toISOString().slice(0, 10),
-    max_date: addDays(today, 1).toISOString().slice(0, 10),
+    max_date: addDays(today, 200).toISOString().slice(0, 10),
   });
   const dates = useMemo(
     () =>

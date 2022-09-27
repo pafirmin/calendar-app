@@ -97,7 +97,7 @@ export const folderSlice = createSlice({
       .addCase(fetchFolders.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.entities = payload.folders;
-        state.selected.push(payload.folders[0].id)
+        state.selected = [payload.folders[0]?.id]
       })
       .addCase(fetchFolders.pending, (state) => {
         state.loading = true;

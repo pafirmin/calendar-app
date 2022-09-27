@@ -1,17 +1,12 @@
 import { List, MenuItem } from "@mui/material";
-import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchFolders, toggleSelected } from "./folders.slice";
+import { toggleSelected } from "./folders.slice";
 
 const FolderList = () => {
   const dispatch = useAppDispatch();
   const { entities: folders, selected } = useAppSelector(
     (state) => state.folders
   );
-
-  useEffect(() => {
-    dispatch(fetchFolders());
-  }, [dispatch]);
 
   return (
     <List>
