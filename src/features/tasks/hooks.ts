@@ -1,16 +1,22 @@
 import { isNil, omitBy } from "lodash";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { TaskFilter } from "./interfaces";
 
 export function useTasksFilter(
   initialState: TaskFilter = {}
-): [TaskFilter, (f: TaskFilter) => void] {
+): [TaskFilter, Dispatch<SetStateAction<TaskFilter>>] {
   const [filter, setFilter] = useState<TaskFilter>(initialState);
 
-  const setTaskFilter = (f: TaskFilter) => {
-    const newState = omitBy({ ...filter, f }, isNil);
+  const setTaskFilter = (f: TaskFilter | ((p: TaskFilter) => TaskFilter)) => {
+    let newState: TaskFilter;
 
-    setFilter(newState);
+    if (typeof f === "function") {
+      newState = f(filter)
+    } else {
+      newState = f
+    }
+
+    setFilter(omitBy({ ...filter, newState }, isNil));
   };
 
   return [filter, setTaskFilter];

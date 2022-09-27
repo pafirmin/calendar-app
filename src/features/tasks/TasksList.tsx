@@ -1,12 +1,11 @@
-import { List, ListItem, Paper, Typography } from "@mui/material";
-import { Fragment, useCallback, useEffect, useMemo } from "react";
+import { List, ListItem, Typography } from "@mui/material";
+import { useCallback, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { showError } from "../alerts/alerts.slice";
 import { useTasksFilter } from "./hooks";
 import Task from "./Task";
 import { clearTasks, fetchTasks } from "./tasks.slice";
 import { addDays, format } from "date-fns";
-import { dateRange } from "../../common/utils";
 import { Dictionary } from "lodash";
 import { Task as ITask } from "./interfaces";
 import { Box } from "@mui/system";
@@ -59,18 +58,18 @@ const TasksList = () => {
     <Box component="article" sx={{ margin: 1 }}>
       <List component="ol">
         {Object.keys(tasksByDate).map((date) => (
-          <li key={date}>
+          <Box key={date} component="li" sx={{ marginBottom: 1 }}>
             <Typography variant="h5">
               {format(new Date(date), "dd/MM/yyyy")}
             </Typography>
-            <List>
+            <List sx={{ paddingTop: 0 }}>
               {tasksByDate[date].map((task) => (
                 <ListItem disableGutters>
                   <Task key={task.id} task={task} />
                 </ListItem>
               ))}
             </List>
-          </li>
+          </Box>
         ))}
       </List>
     </Box>
