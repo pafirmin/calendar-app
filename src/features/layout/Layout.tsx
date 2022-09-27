@@ -2,7 +2,6 @@ import {
   AppBar,
   Box,
   Drawer,
-  Stack,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -10,7 +9,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch } from "../../app/hooks";
 import RequireAuth from "../auth/RequireAuth";
 import FolderList from "../folders/FolderList";
 import { fetchFolders } from "../folders/folders.slice";
@@ -37,7 +36,7 @@ const Layout = () => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", minHeight: "100vh" }}>
         <Box
           component="aside"
           sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}

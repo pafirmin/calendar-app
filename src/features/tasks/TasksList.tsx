@@ -1,12 +1,15 @@
-import { List } from "@mui/material";
-import { useCallback, useEffect, useMemo } from "react";
+import { List, ListItem, Paper, Typography } from "@mui/material";
+import { Fragment, useCallback, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { showError } from "../alerts/alerts.slice";
 import { useTasksFilter } from "./hooks";
 import Task from "./Task";
 import { clearTasks, fetchTasks } from "./tasks.slice";
-import { addDays } from "date-fns";
+import { addDays, format } from "date-fns";
 import { dateRange } from "../../common/utils";
+import { Dictionary } from "lodash";
+import { Task as ITask } from "./interfaces";
+import { Box } from "@mui/system";
 
 const TasksList = () => {
   const today = useMemo(() => new Date(), []);
@@ -17,13 +20,23 @@ const TasksList = () => {
     min_date: today.toISOString().slice(0, 10),
     max_date: addDays(today, 200).toISOString().slice(0, 10),
   });
-  const dates = useMemo(
+
+  const tasksByDate = useMemo(
     () =>
-      dateRange(
-        new Date(taskFilter.min_date as string),
-        new Date(taskFilter.max_date as string)
-      ),
-    [taskFilter.min_date, taskFilter.max_date]
+      tasks.reduce<Dictionary<ITask[]>>((obj, task) => {
+        const date = task.datetime.slice(0, 10);
+
+        if (obj[date]) {
+          obj[date].push(task);
+
+          return obj;
+        }
+
+        obj[date] = new Array(task);
+
+        return obj;
+      }, {}),
+    [tasks]
   );
 
   const handleFetchTasks = useCallback(async () => {
@@ -43,11 +56,24 @@ const TasksList = () => {
   }, [dispatch, handleFetchTasks, selected.length]);
 
   return (
-    <List>
-      {tasks.map((task) => (
-        <Task key={task.id} task={task} />
-      ))}
-    </List>
+    <Box component="article" sx={{ margin: 1 }}>
+      <List component="ol">
+        {Object.keys(tasksByDate).map((date) => (
+          <li key={date}>
+            <Typography variant="h5">
+              {format(new Date(date), "dd/MM/yyyy")}
+            </Typography>
+            <List>
+              {tasksByDate[date].map((task) => (
+                <ListItem disableGutters>
+                  <Task key={task.id} task={task} />
+                </ListItem>
+              ))}
+            </List>
+          </li>
+        ))}
+      </List>
+    </Box>
   );
 };
 

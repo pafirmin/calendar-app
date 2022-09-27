@@ -1,3 +1,9 @@
-import {createTheme} from "@mui/material";
+import {createTheme, PaletteOptions} from "@mui/material";
 
-export default createTheme();
+const palette: PaletteOptions = {
+  background: {
+    default: "#f8f8f8",
+  }
+};
+
+export default createTheme({palette});
