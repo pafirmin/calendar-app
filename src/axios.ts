@@ -32,6 +32,12 @@ axios.interceptors.response.use(
           store.dispatch(logout());
           localStorage.clear();
           break;
+        case StatusCodes.UNPROCESSABLE_ENTITY:
+          return Promise.reject({
+            status: error.response.status,
+            message: error.response.data.message,
+            fields: error.response.data.fields,
+          })
         case StatusCodes.IM_A_TEAPOT:
           break
         default:

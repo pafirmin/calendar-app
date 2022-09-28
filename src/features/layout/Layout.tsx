@@ -14,7 +14,7 @@ import RequireAuth from "../auth/RequireAuth";
 import FolderList from "../folders/FolderList";
 import { fetchFolders } from "../folders/folders.slice";
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const Layout = () => {
   const [mobileOpen, setMobileOpen] = useState(true);
@@ -24,7 +24,7 @@ const Layout = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchFolders());
+    dispatch(fetchFolders({ sort: "name" }));
   }, [dispatch]);
 
   return (
@@ -66,6 +66,7 @@ const Layout = () => {
           sx={{
             flexGrow: 1,
             width: { sm: `calc(100% - ${drawerWidth}px)` },
+            margin: 1,
           }}
         >
           <Outlet />

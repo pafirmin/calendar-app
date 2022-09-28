@@ -55,7 +55,7 @@ const TasksList = () => {
   }, [dispatch, handleFetchTasks, selected.length]);
 
   return (
-    <Box component="article" sx={{ margin: 1 }}>
+    <Box component="article">
       <List component="ol">
         {Object.keys(tasksByDate).map((date) => (
           <Box key={date} component="li" sx={{ marginBottom: 1 }}>
@@ -64,8 +64,8 @@ const TasksList = () => {
             </Typography>
             <List sx={{ paddingTop: 0 }}>
               {tasksByDate[date].map((task) => (
-                <ListItem disableGutters>
-                  <Task key={task.id} task={task} />
+                <ListItem key={task.id} disableGutters>
+                  <Task task={task} />
                 </ListItem>
               ))}
             </List>
