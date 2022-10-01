@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { createFolder, toggleSelected } from "./folders.slice";
 import { ChangeEvent, FormEvent, useState } from "react";
@@ -23,18 +25,33 @@ const FolderList = () => {
   );
   const [inputActive, setInputActive] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [inputError, setInputError] = useState("");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewFolderName(e.currentTarget.value);
   };
 
+  const handleToggleInput = () => {
+    if (!inputActive) {
+      setInputActive(true);
+    } else {
+      setInputActive(false);
+      setInputError("");
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!newFolderName) {
+      setInputError("Folder name cannot be empty");
+    }
 
     try {
       await dispatch(createFolder({ name: newFolderName })).unwrap();
 
       setNewFolderName("");
+      setInputError("");
       setInputActive(false);
     } catch (err) {
       console.log(err);
@@ -48,16 +65,34 @@ const FolderList = () => {
         sx={{ fontSize: "1.5rem", margin: 0, justifyContent: "space-between" }}
       >
         Your Folders
-        <Tooltip title="Create new folder">
-          <IconButton onClick={() => setInputActive(!inputActive)}>
-            <CreateNewFolderIcon color="secondary" />
-          </IconButton>
-        </Tooltip>
+        {inputActive ? (
+          <Tooltip title="Cancel">
+            <IconButton
+              aria-label="cancel create folder"
+              onClick={handleToggleInput}
+            >
+              <CancelIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Create new folder">
+            <IconButton
+              aria-label="Create new folder"
+              onClick={handleToggleInput}
+            >
+              <CreateNewFolderIcon color="secondary" />
+            </IconButton>
+          </Tooltip>
+        )}
       </ListItem>
       <List>
         {inputActive && (
           <ListItem>
-            <Box component="form" onSubmit={handleSubmit}>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{ width: "100%" }}
+            >
               <TextField
                 fullWidth
                 autoFocus
@@ -65,6 +100,8 @@ const FolderList = () => {
                 name="new-folder-name"
                 value={newFolderName}
                 onChange={handleChange}
+                helperText={inputError}
+                error={Boolean(inputError)}
               />
             </Box>
           </ListItem>

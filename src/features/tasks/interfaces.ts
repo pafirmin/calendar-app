@@ -10,7 +10,7 @@ export interface Task {
   datetime: string;
   created: string;
   updated: string;
-  folder_id: string;
+  folder_id: number;
 }
 
 export interface TaskFilter extends BaseAPIQuery<Task> {
@@ -22,8 +22,8 @@ export interface TaskFilter extends BaseAPIQuery<Task> {
 
 export interface CreateTaskDTO {
   title: string;
-  date: string;
   description: string;
+  datetime: string;
 }
 
 export interface UpdateTaskDTO extends Partial<CreateTaskDTO> {

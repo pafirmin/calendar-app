@@ -30,6 +30,6 @@ export interface AuthAPI {
   login: (
     c: Credentials
   ) => Promise<AxiosResponse<{ access_token: string; user: User }>>;
-  createUser: (b: CreateUserDTO) => Promise<AxiosResponse<{user: User}>>,
+  createUser: (c: CreateUserDTO) => Promise<AxiosResponse<{user: User}>>,
   fetchUser: () => Promise<AxiosResponse<{ user: User }>>
 }
