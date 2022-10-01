@@ -111,7 +111,7 @@ const taskSlice = createSlice({
     builder
       .addCase(fetchTasks.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.entities = payload.tasks;
+        state.entities.push(...payload.tasks);
         state.metadata = payload.metadata;
       })
       .addCase(fetchTasks.pending, (state) => {
