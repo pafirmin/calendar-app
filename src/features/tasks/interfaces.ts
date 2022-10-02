@@ -32,6 +32,7 @@ export interface UpdateTaskDTO extends Partial<CreateTaskDTO> {
 
 export interface TaskState {
   entities: Task[];
+  newTaskDate: string;
   metadata: APIMetaData;
   loading: boolean;
 }

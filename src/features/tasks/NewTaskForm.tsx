@@ -1,34 +1,98 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Formik } from "formik";
+import { StatusCodes } from "http-status-codes";
 import * as Yup from "yup";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { ValidationFailedResponse } from "../../common/types";
+import {
+  showError,
+  showSuccess,
+  unexpectedError,
+} from "../alerts/alerts.slice";
 import { CreateTaskDTO } from "./interfaces";
+import { createTask } from "./tasks.slice";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Please enter a title for your task"),
   description: Yup.string().max(500),
-  datetime: Yup.date(),
+  datetime: Yup.date().required(),
+  folderId: Yup.number().required(),
 });
 
+type NewTaskFormValues = Omit<CreateTaskDTO, "datetime"> & {
+  datetime: Date;
+  folderId: number;
+};
+
 const NewTaskForm = () => {
-  const initialValues: CreateTaskDTO = {
+  const { newTaskDate } = useAppSelector((state) => state.tasks);
+  const { entities: folders } = useAppSelector((state) => state.folders);
+  const dispatch = useAppDispatch();
+  const initialValues: NewTaskFormValues = {
     title: "",
     description: "",
-    datetime: "",
+    datetime: new Date(newTaskDate),
+    folderId: folders[0].id,
   };
 
   return (
     <Formik
-      initialValues={initialValues}
-      onSubmit={() => {}}
       validationSchema={validationSchema}
-      validateOnBlur
+      initialValues={initialValues}
+      onSubmit={async (values, { resetForm, setErrors }) => {
+        const dto: CreateTaskDTO = {
+          ...values,
+          datetime: values.datetime.toISOString(),
+        };
+
+        try {
+          await dispatch(
+            createTask({
+              folderId: values.folderId,
+              body: dto,
+            })
+          ).unwrap();
+
+          resetForm({
+            values: {
+              folderId: values.folderId,
+              datetime: values.datetime,
+              title: "",
+              description: "",
+            },
+          });
+
+          dispatch(showSuccess("Task created!"));
+        } catch (err: any) {
+          console.error(err);
+          switch (err.status) {
+            case StatusCodes.UNPROCESSABLE_ENTITY:
+              dispatch(showError(err.message));
+              setErrors(
+                (err as ValidationFailedResponse<CreateTaskDTO>).fields
+              );
+              break;
+            default:
+              dispatch(unexpectedError());
+          }
+        }
+      }}
     >
       {(formik) => (
         <Box component="form" onSubmit={formik.handleSubmit} noValidate>
           <Typography gutterBottom variant="h3" textAlign="center">
             New Task
           </Typography>
-          <Stack spacing={2}>
+          <Stack spacing={4}>
             <TextField
               name="title"
               label="Title"
@@ -53,7 +117,42 @@ const NewTaskForm = () => {
                 formik.touched.description && formik.errors.description
               }
             />
-            <Button type="submit">Create Task</Button>
+            <TextField
+              select
+              name="folderId"
+              label="Folder"
+              value={formik.values.folderId}
+              onChange={formik.handleChange}
+            >
+              {folders.map((folder) => (
+                <MenuItem key={folder.id} value={folder.id}>
+                  {folder.name}
+                </MenuItem>
+              ))}
+            </TextField>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DateTimePicker
+                renderInput={(props) => (
+                  <TextField
+                    name="datetime"
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.datetime && Boolean(formik.errors.datetime)
+                    }
+                    helperText={
+                      formik.errors.datetime && "Please enter a valid date"
+                    }
+                    {...props}
+                  />
+                )}
+                label="When?"
+                value={formik.values.datetime}
+                onChange={(val) => formik.setFieldValue("datetime", val)}
+              />
+            </LocalizationProvider>
+            <Button type="submit" onClick={() => console.log(formik.values)}>
+              Create Task
+            </Button>
           </Stack>
         </Box>
       )}

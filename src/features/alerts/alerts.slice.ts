@@ -30,13 +30,26 @@ export const alertsSlice = createSlice({
     showError: (state, action: PayloadAction<string>) => {
       state.push({ severity: Severity.ERROR, message: action.payload });
     },
+    unexpectedError: (state) => {
+      state.push({
+        severity: Severity.ERROR,
+        message:
+          "Sorry, we could not process your request. Please try again later",
+      });
+    },
     shiftAlert: (state) => {
       return state.slice(1);
     },
   },
 });
 
-export const { showInfo, showError, showWarning, shiftAlert } =
-  alertsSlice.actions;
+export const {
+  showSuccess,
+  showInfo,
+  showError,
+  showWarning,
+  unexpectedError,
+  shiftAlert,
+} = alertsSlice.actions;
 
 export default alertsSlice.reducer;

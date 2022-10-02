@@ -14,20 +14,22 @@ const TasksList = () => {
   return (
     <Box component="article">
       <List component="ol">
-        {Object.keys(tasks).map((date) => (
-          <Box key={date} component="li" sx={{ marginBottom: 1 }}>
-            <Typography variant="h5">
-              <time>{format(new Date(date), "dd/MM/yyyy")}</time>
-            </Typography>
-            <List sx={{ paddingTop: 0 }}>
-              {tasks[date].map((task) => (
-                <ListItem key={task.id} disableGutters>
-                  <Task task={task} />
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        ))}
+        {Object.keys(tasks)
+          .sort()
+          .map((date) => (
+            <Box key={date} component="li" sx={{ marginBottom: 1 }}>
+              <Typography variant="h5">
+                <time>{format(new Date(date), "dd/MM/yyyy")}</time>
+              </Typography>
+              <List sx={{ paddingTop: 0 }}>
+                {tasks[date].map((task) => (
+                  <ListItem key={task.id} disableGutters>
+                    <Task task={task} />
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          ))}
       </List>
     </Box>
   );

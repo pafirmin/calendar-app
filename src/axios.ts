@@ -1,6 +1,7 @@
 import Axios from "axios";
-import {StatusCodes} from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { store } from "./app/store";
+import { ValidationFailedResponse } from "./common/types";
 import { logout } from "./features/auth/auth.slice";
 
 const axios = Axios.create({
@@ -23,7 +24,7 @@ axios.interceptors.request.use((config) => {
 
 axios.interceptors.response.use(
   (response) => {
-    return response
+    return response;
   },
   async (error) => {
     if (error.response) {
@@ -37,9 +38,9 @@ axios.interceptors.response.use(
             status: error.response.status,
             message: error.response.data.message,
             fields: error.response.data.fields,
-          })
+          } as ValidationFailedResponse<any>);
         case StatusCodes.IM_A_TEAPOT:
-          break
+          break;
         default:
           break;
       }

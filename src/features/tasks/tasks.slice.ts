@@ -1,9 +1,9 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { StatusCodes } from "http-status-codes";
 import { AppAPI } from "../../app/api";
 import { RootState } from "../../app/store";
 import { APIMetaData } from "../../common/interfaces";
-import { FieldErrors } from "../../common/types";
+import { ValidationFailedResponse } from "../../common/types";
 import {
   TaskState,
   Task,
@@ -14,6 +14,7 @@ import {
 
 const initialState: TaskState = {
   entities: [],
+  newTaskDate: new Date().toISOString(),
   loading: false,
   metadata: {
     current_page: 0,
@@ -55,7 +56,7 @@ export const nextPage = createAsyncThunk<
 export const createTask = createAsyncThunk<
   { task: Task },
   { folderId: number; body: CreateTaskDTO },
-  { rejectValue: FieldErrors<CreateTaskDTO>, extra: AppAPI }
+  { rejectValue: ValidationFailedResponse<CreateTaskDTO>; extra: AppAPI }
 >("tasks/create", async (payload, { rejectWithValue, extra: api }) => {
   try {
     const res = await api.tasks.createTask(payload.folderId, payload.body);
@@ -64,7 +65,7 @@ export const createTask = createAsyncThunk<
   } catch (err: any) {
     switch (err.status) {
       case StatusCodes.UNPROCESSABLE_ENTITY:
-        return rejectWithValue(err.fields as FieldErrors<CreateTaskDTO>);
+        return rejectWithValue(err as ValidationFailedResponse<CreateTaskDTO>);
       default:
         throw err;
     }
@@ -74,7 +75,7 @@ export const createTask = createAsyncThunk<
 export const updateTask = createAsyncThunk<
   { task: Task },
   { id: number; body: UpdateTaskDTO },
-  { rejectValue: FieldErrors<UpdateTaskDTO>, extra: AppAPI }
+  { rejectValue: ValidationFailedResponse<UpdateTaskDTO>; extra: AppAPI }
 >("tasks/update", async (payload, { rejectWithValue, extra: api }) => {
   try {
     const res = await api.tasks.updateTask(payload.id, payload.body);
@@ -83,7 +84,7 @@ export const updateTask = createAsyncThunk<
   } catch (err: any) {
     switch (err.status) {
       case StatusCodes.UNPROCESSABLE_ENTITY:
-        return rejectWithValue(err.fields as FieldErrors<UpdateTaskDTO>);
+        return rejectWithValue(err as ValidationFailedResponse<UpdateTaskDTO>);
       default:
         throw err;
     }
@@ -105,7 +106,13 @@ const taskSlice = createSlice({
   reducers: {
     clearTasks: (state) => {
       state.entities = [];
-    }
+    },
+    setNewTaskDate: (
+      state,
+      { payload }: PayloadAction<{ datetime: string }>
+    ) => {
+      state.newTaskDate = payload.datetime;
+    },
   },
   extraReducers: (builder) => {
     builder
