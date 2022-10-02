@@ -16,7 +16,7 @@ import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { createFolder, toggleSelected } from "./folders.slice";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, Fragment, useState } from "react";
 
 const FolderList = () => {
   const dispatch = useAppDispatch();
@@ -59,8 +59,18 @@ const FolderList = () => {
   };
 
   return (
-    <Box sx={{ marginTop: 1 }}>
-      <ListItem sx={{ margin: 0, justifyContent: "space-between" }}>
+    <Fragment>
+      <Box
+        component="header"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingLeft: 2,
+          paddingRight: 2,
+          paddingTop: 1,
+        }}
+      >
         <Typography variant="h2" sx={{ marginBottom: 0 }}>
           Your folders
         </Typography>
@@ -83,8 +93,8 @@ const FolderList = () => {
             </IconButton>
           </Tooltip>
         )}
-      </ListItem>
-      <List>
+      </Box>
+      <List sx={{ height: "100%", overflowY: "scroll" }}>
         {inputActive && (
           <ListItem>
             <Box
@@ -120,7 +130,7 @@ const FolderList = () => {
           </MenuItem>
         ))}
       </List>
-    </Box>
+    </Fragment>
   );
 };
 

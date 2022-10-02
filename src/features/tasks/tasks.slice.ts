@@ -29,12 +29,8 @@ export const fetchTasks = createAsyncThunk<
   { metadata: APIMetaData; tasks: Task[] },
   TaskFilter,
   { extra: AppAPI }
->("tasks/fetch", async (payload, { getState, extra: api }) => {
-  const { folders } = getState() as RootState;
-  const res = await api.tasks.fetchTasks({
-    ...payload,
-    folder_id: folders.selected,
-  });
+>("tasks/fetch", async (payload, { extra: api }) => {
+  const res = await api.tasks.fetchTasks(payload);
 
   return res.data;
 });
@@ -44,10 +40,10 @@ export const nextPage = createAsyncThunk<
   TaskFilter,
   { extra: AppAPI }
 >("tasks/fetch", async (payload, { getState, extra: api }) => {
-  const { folders } = getState() as RootState;
+  const { tasks } = getState() as RootState;
   const res = await api.tasks.fetchTasks({
     ...payload,
-    folder_id: folders.selected,
+    page: tasks.metadata.current_page + 1,
   });
 
   return res.data;
@@ -104,9 +100,6 @@ const taskSlice = createSlice({
   name: "tasks",
   initialState,
   reducers: {
-    clearTasks: (state) => {
-      state.entities = [];
-    },
     setNewTaskDate: (
       state,
       { payload }: PayloadAction<{ datetime: string }>
@@ -118,7 +111,7 @@ const taskSlice = createSlice({
     builder
       .addCase(fetchTasks.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.entities.push(...payload.tasks);
+        state.entities = payload.tasks;
         state.metadata = payload.metadata;
       })
       .addCase(fetchTasks.pending, (state) => {
@@ -140,7 +133,5 @@ const taskSlice = createSlice({
       });
   },
 });
-
-export const { clearTasks } = taskSlice.actions;
 
 export default taskSlice.reducer;

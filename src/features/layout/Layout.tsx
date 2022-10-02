@@ -21,7 +21,7 @@ const taskMenuWidth = 430;
 
 const Layout = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useAppDispatch();
   const { drawers } = useAppSelector((state) => state.layout);
 
@@ -31,75 +31,93 @@ const Layout = () => {
 
   return (
     <RequireAuth>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h1" fontSize="3rem">
-            GoToDo
-          </Typography>
-          <button
-            onClick={() =>
-              dispatch(toggleDrawer({ anchor: "right", open: true }))
-            }
-          >
-            open
-          </button>
-        </Toolbar>
-      </AppBar>
-      <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
+        }}
+      >
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h1" fontSize="3rem">
+              GoToDo
+            </Typography>
+            <button
+              onClick={() =>
+                dispatch(toggleDrawer({ anchor: "left", open: true }))
+              }
+            >
+              open
+            </button>
+          </Toolbar>
+        </AppBar>
         <Box
-          component="aside"
-          sx={{ width: { sm: folderMenuWidth }, flexShrink: { sm: 0 } }}
+          sx={{
+            display: "flex",
+            overflowY: "hidden",
+            width: { sm: 1200 },
+          }}
         >
-          {isMobile ? (
+          <Box
+            component="aside"
+            sx={{
+              width: { md: folderMenuWidth },
+              flexShrink: { md: 0 },
+              height: "100%",
+            }}
+          >
+            {isMobile ? (
+              <Drawer
+                variant={isMobile ? "temporary" : "permanent"}
+                open={drawers.left}
+                onClose={() =>
+                  dispatch(toggleDrawer({ anchor: "left", open: false }))
+                }
+                sx={{
+                  "& .MuiDrawer-paper": {
+                    boxSizing: "border-box",
+                    width: folderMenuWidth,
+                  },
+                }}
+              >
+                <FolderList />
+              </Drawer>
+            ) : (
+              <FolderList />
+            )}
+          </Box>
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              width: { md: `calc(100% - ${folderMenuWidth}px)` },
+            }}
+          >
+            <Outlet />
+          </Box>
+          <Box component="aside" sx={{ flexShrink: 0 }}>
             <Drawer
-              variant={isMobile ? "temporary" : "permanent"}
-              open={drawers.left}
+              variant="temporary"
+              open={drawers.right}
+              anchor="right"
               onClose={() =>
-                dispatch(toggleDrawer({ anchor: "left", open: false }))
+                dispatch(toggleDrawer({ anchor: "right", open: false }))
               }
               sx={{
                 "& .MuiDrawer-paper": {
                   boxSizing: "border-box",
-                  width: folderMenuWidth,
+                  width: taskMenuWidth,
+                  maxWidth: "100vw",
+                  padding: 4,
                 },
               }}
             >
-              <FolderList />
+              <NewTaskForm />
             </Drawer>
-          ) : (
-            <Box>{<FolderList />}</Box>
-          )}
+          </Box>
         </Box>
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            width: { sm: `calc(100% - ${folderMenuWidth}px)` },
-            margin: 1,
-          }}
-        >
-          <Outlet />
-        </Box>
-        <Box component="aside" sx={{ flexShrink: 0 }}>
-          <Drawer
-            variant="temporary"
-            open={drawers.right}
-            anchor="right"
-            onClose={() =>
-              dispatch(toggleDrawer({ anchor: "right", open: false }))
-            }
-            sx={{
-              "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: taskMenuWidth,
-                maxWidth: "100vw",
-                padding: 4,
-              },
-            }}
-          >
-            <NewTaskForm />
-          </Drawer>
-        </Box>
+        <div />
       </Box>
     </RequireAuth>
   );

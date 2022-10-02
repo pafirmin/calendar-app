@@ -1,14 +1,9 @@
 import { isNil, omitBy } from "lodash";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { showError } from "../alerts/alerts.slice";
 import { Task, TaskFilter } from "./interfaces";
-import { fetchTasks, clearTasks } from "./tasks.slice";
+import { fetchTasks } from "./tasks.slice";
 
 export function useFetchTasks(initialState: TaskFilter = {}) {
   const [tasksFilter, setTasksFilter] = useState<TaskFilter>(initialState);
@@ -30,20 +25,22 @@ export function useFetchTasks(initialState: TaskFilter = {}) {
 
   const tasksByDate = useMemo(
     () =>
-      tasks.reduce<Record<string, Task[]>>((obj, task) => {
-        const date = task.datetime.slice(0, 10);
+      tasks
+        .filter((task) => selected.includes(task.folder_id))
+        .reduce<Record<string, Task[]>>((obj, task) => {
+          const date = task.datetime.slice(0, 10);
 
-        if (obj[date]) {
-          obj[date].push(task);
+          if (obj[date]) {
+            obj[date].push(task);
+
+            return obj;
+          }
+
+          obj[date] = new Array(task);
 
           return obj;
-        }
-
-        obj[date] = new Array(task);
-
-        return obj;
-      }, {}),
-    [tasks]
+        }, {}),
+    [tasks, selected]
   );
 
   const handleFetchTasks = useCallback(async () => {
@@ -58,8 +55,6 @@ export function useFetchTasks(initialState: TaskFilter = {}) {
     if (selected.length > 0) {
       handleFetchTasks();
     }
-
-    return () => void dispatch(clearTasks());
   }, [dispatch, handleFetchTasks, selected.length]);
 
   return [tasksByDate, { values: tasksFilter, set: setTaskFilter }] as const;

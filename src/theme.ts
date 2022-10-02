@@ -6,10 +6,16 @@ const lightPalette: PaletteOptions = {
     default: "#f8f8f8",
   },
   primary: {
-    main: "#00796B",
-    light: "#26A69A",
-    dark: "#00695C",
+    main: "#2C4F70",
+    light: "#4C6D8C",
+    dark: "#051F39",
   },
+  secondary: {
+    main: "#287459",
+    light: "#4A9077",
+    dark: "#013B27",
+
+  }
 };
 
 const darkPalette: PaletteOptions = {
