@@ -18,7 +18,7 @@ const TasksList = () => {
           .sort()
           .map((date) => (
             <Box key={date} component="li" sx={{ marginBottom: 1 }}>
-              <Typography variant="h5">
+              <Typography variant="h3">
                 <time>{format(new Date(date), "dd/MM/yyyy")}</time>
               </Typography>
               <List sx={{ paddingTop: 0 }}>

@@ -1,15 +1,20 @@
 import { ThemeProvider } from "@emotion/react";
-import { CssBaseline } from "@mui/material";
+import { createTheme, CssBaseline } from "@mui/material";
+import { useMemo } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useAppSelector } from "./app/hooks";
 import Alerts from "./features/alerts/Alerts";
 import Login from "./features/auth/Login";
 import Layout from "./features/layout/Layout";
 import TasksList from "./features/tasks/TasksList";
-import theme from "./theme";
+import getTheme from "./theme";
 
 function App() {
+  const { theme } = useAppSelector((state) => state.layout);
+  const currentTheme = useMemo(() => createTheme(getTheme(theme)), [theme]);
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={currentTheme}>
       <CssBaseline />
       <Alerts />
       <BrowserRouter>

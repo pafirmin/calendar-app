@@ -9,11 +9,11 @@ import {
   MenuItem,
   TextField,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import CancelIcon from "@mui/icons-material/Cancel";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { createFolder, toggleSelected } from "./folders.slice";
 import { ChangeEvent, FormEvent, useState } from "react";
@@ -60,11 +60,10 @@ const FolderList = () => {
 
   return (
     <Box sx={{ marginTop: 1 }}>
-      <ListItem
-        component="h2"
-        sx={{ fontSize: "1.5rem", margin: 0, justifyContent: "space-between" }}
-      >
-        Your Folders
+      <ListItem sx={{ margin: 0, justifyContent: "space-between" }}>
+        <Typography variant="h2" sx={{ marginBottom: 0 }}>
+          Your folders
+        </Typography>
         {inputActive ? (
           <Tooltip title="Cancel">
             <IconButton

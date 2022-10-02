@@ -10,6 +10,7 @@ import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Formik } from "formik";
 import { StatusCodes } from "http-status-codes";
+import { useEffect, useRef } from "react";
 import * as Yup from "yup";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { ValidationFailedResponse } from "../../common/types";
@@ -34,6 +35,7 @@ type NewTaskFormValues = Omit<CreateTaskDTO, "datetime"> & {
 };
 
 const NewTaskForm = () => {
+  const titleInputRef = useRef<HTMLInputElement>(null);
   const { newTaskDate } = useAppSelector((state) => state.tasks);
   const { entities: folders } = useAppSelector((state) => state.folders);
   const dispatch = useAppDispatch();
@@ -44,10 +46,18 @@ const NewTaskForm = () => {
     folderId: folders[0].id,
   };
 
+  useEffect(() => {
+    if (titleInputRef.current) {
+      titleInputRef.current.focus();
+    }
+  }, [titleInputRef]);
+
   return (
     <Formik
       validationSchema={validationSchema}
       initialValues={initialValues}
+      validateOnChange
+      validateOnBlur={false}
       onSubmit={async (values, { resetForm, setErrors }) => {
         const dto: CreateTaskDTO = {
           ...values,
@@ -88,12 +98,13 @@ const NewTaskForm = () => {
       }}
     >
       {(formik) => (
-        <Box component="form" onSubmit={formik.handleSubmit} noValidate>
-          <Typography gutterBottom variant="h3" textAlign="center">
-            New Task
-          </Typography>
+        <Box component="form" onSubmit={formik.handleSubmit}>
           <Stack spacing={4}>
+            <Typography variant="h2" textAlign="center">
+              Create a new task
+            </Typography>
             <TextField
+              required
               name="title"
               label="Title"
               value={formik.values.title}
@@ -101,6 +112,7 @@ const NewTaskForm = () => {
               onChange={formik.handleChange}
               error={formik.touched.title && Boolean(formik.errors.title)}
               helperText={formik.touched.title && formik.errors.title}
+              inputRef={titleInputRef}
             />
             <TextField
               multiline
@@ -150,7 +162,7 @@ const NewTaskForm = () => {
                 onChange={(val) => formik.setFieldValue("datetime", val)}
               />
             </LocalizationProvider>
-            <Button type="submit" onClick={() => console.log(formik.values)}>
+            <Button type="submit" variant="outlined">
               Create Task
             </Button>
           </Stack>

@@ -8,7 +8,7 @@ interface Props {
 const Task = ({ task }: Props) => {
   return (
     <Paper key={task.id} sx={{ padding: 2, width: "100%" }}>
-      <Typography variant="h6">{task.title}</Typography>
+      <Typography variant="h4">{task.title}</Typography>
       <Typography sx={(theme) => ({ color: theme.palette.text.secondary })}>
         {task.description}
       </Typography>
