@@ -28,11 +28,15 @@ export const login = createAsyncThunk<
 export const fetchUser = createAsyncThunk<
   { user: User },
   undefined,
-  { extra: AppAPI }
->("auth/fetch", async (_, { extra: api }) => {
-  const res = await api.auth.fetchUser();
+  { rejectValue: any, extra: AppAPI }
+>("auth/fetch", async (_, { rejectWithValue, extra: api }) => {
+  try {
+    const res = await api.auth.fetchUser();
 
-  return res.data;
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err);
+  }
 });
 
 const authSlice = createSlice({

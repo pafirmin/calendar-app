@@ -29,10 +29,14 @@ export const fetchTasks = createAsyncThunk<
   { metadata: APIMetaData; tasks: Task[] },
   TaskFilter,
   { extra: AppAPI }
->("tasks/fetch", async (payload, { extra: api }) => {
-  const res = await api.tasks.fetchTasks(payload);
+>("tasks/fetch", async (payload, { rejectWithValue, extra: api }) => {
+  try {
+    const res = await api.tasks.fetchTasks(payload);
 
-  return res.data;
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err);
+  }
 });
 
 export const nextPage = createAsyncThunk<
@@ -52,49 +56,44 @@ export const nextPage = createAsyncThunk<
 export const createTask = createAsyncThunk<
   { task: Task },
   { folderId: number; body: CreateTaskDTO },
-  { rejectValue: ValidationFailedResponse<CreateTaskDTO>; extra: AppAPI }
+  {  extra: AppAPI }
 >("tasks/create", async (payload, { rejectWithValue, extra: api }) => {
   try {
     const res = await api.tasks.createTask(payload.folderId, payload.body);
 
     return res.data;
-  } catch (err: any) {
-    switch (err.status) {
-      case StatusCodes.UNPROCESSABLE_ENTITY:
-        return rejectWithValue(err as ValidationFailedResponse<CreateTaskDTO>);
-      default:
-        throw err;
-    }
+  } catch (err) {
+    return rejectWithValue(err);
   }
 });
 
 export const updateTask = createAsyncThunk<
   { task: Task },
   { id: number; body: UpdateTaskDTO },
-  { rejectValue: ValidationFailedResponse<UpdateTaskDTO>; extra: AppAPI }
+  { extra: AppAPI }
 >("tasks/update", async (payload, { rejectWithValue, extra: api }) => {
   try {
     const res = await api.tasks.updateTask(payload.id, payload.body);
 
     return res.data;
-  } catch (err: any) {
-    switch (err.status) {
-      case StatusCodes.UNPROCESSABLE_ENTITY:
-        return rejectWithValue(err as ValidationFailedResponse<UpdateTaskDTO>);
-      default:
-        throw err;
-    }
+  } catch (err) {
+    return rejectWithValue(err);
   }
 });
 
-export const deleteTask = createAsyncThunk<number, number, { extra: AppAPI }>(
-  "tasks/delete",
-  async (id: number, { extra: api }) => {
+export const deleteTask = createAsyncThunk<
+  number,
+  number,
+  { extra: AppAPI; rejectValue: any }
+>("tasks/delete", async (id: number, { rejectWithValue, extra: api }) => {
+  try {
     await api.tasks.deleteTask(id);
 
     return id;
+  } catch (err) {
+    return rejectWithValue(err);
   }
-);
+});
 
 const taskSlice = createSlice({
   name: "tasks",

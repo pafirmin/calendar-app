@@ -1,8 +1,6 @@
 import Axios from "axios";
 import { StatusCodes } from "http-status-codes";
-import { store } from "./app/store";
 import { ValidationFailedResponse } from "./common/types";
-import { logout } from "./features/auth/auth.slice";
 
 const axios = Axios.create({
   headers: {
@@ -29,27 +27,20 @@ axios.interceptors.response.use(
   async (error) => {
     if (error.response) {
       switch (error.response.status) {
-        case StatusCodes.UNAUTHORIZED:
-          store.dispatch(logout());
-          localStorage.clear();
-          break;
         case StatusCodes.UNPROCESSABLE_ENTITY:
           return Promise.reject({
             status: error.response.status,
             message: error.response.data.message,
             fields: error.response.data.fields,
           } as ValidationFailedResponse<any>);
-        case StatusCodes.IM_A_TEAPOT:
-          break;
         default:
-          break;
+          return Promise.reject({
+            status: error.response.status,
+            message: error.response.data.message,
+          });
       }
-
-      return Promise.reject({
-        status: error.response.status,
-        message: error.response.data.message,
-      });
     }
+
     return Promise.reject({ message: error.message });
   }
 );

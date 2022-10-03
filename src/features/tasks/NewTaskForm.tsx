@@ -54,7 +54,7 @@ const NewTaskForm = () => {
 
   return (
     <Formik
-      validationSchema={validationSchema}
+      validationSchema
       initialValues={initialValues}
       validateOnChange
       validateOnBlur={false}
@@ -86,19 +86,18 @@ const NewTaskForm = () => {
           console.error(err);
           switch (err.status) {
             case StatusCodes.UNPROCESSABLE_ENTITY:
-              dispatch(showError(err.message));
               setErrors(
                 (err as ValidationFailedResponse<CreateTaskDTO>).fields
               );
               break;
             default:
-              dispatch(unexpectedError());
+              break;
           }
         }
       }}
     >
       {(formik) => (
-        <Box component="form" onSubmit={formik.handleSubmit}>
+        <Box component="form" onSubmit={formik.handleSubmit} noValidate>
           <Stack spacing={4}>
             <Typography variant="h2" textAlign="center">
               Create a new task
@@ -162,7 +161,11 @@ const NewTaskForm = () => {
                 onChange={(val) => formik.setFieldValue("datetime", val)}
               />
             </LocalizationProvider>
-            <Button type="submit" variant="outlined">
+            <Button
+              type="submit"
+              variant="outlined"
+              disabled={formik.isSubmitting}
+            >
               Create Task
             </Button>
           </Stack>

@@ -1,33 +1,32 @@
-import { Action, Middleware } from "@reduxjs/toolkit";
+import { isRejectedWithValue, Middleware } from "@reduxjs/toolkit";
+import { StatusCodes } from "http-status-codes";
+import { showError, unexpectedError } from "../features/alerts/alerts.slice";
 import { logout } from "../features/auth/auth.slice";
 
-export const persistAuth: Middleware =
-  (store) =>
-  (next) =>
-  <A extends Action>(action: A) => {
-    const result = next(action);
-
-    if (action.type?.startsWith("auth/")) {
-      const state = store.getState().auth;
-      localStorage.setItem("authState", state);
+export const catchAPIError: Middleware = (store) => (next) => (action) => {
+  if (isRejectedWithValue(action)) {
+    switch (action.payload.status) {
+      case StatusCodes.UNAUTHORIZED:
+        localStorage.clear();
+        store.dispatch(logout());
+        store.dispatch(
+          showError("You have been logged out. Please log back in")
+        );
+        break;
+      case StatusCodes.UNPROCESSABLE_ENTITY:
+        store.dispatch(showError("Validation failed"));
+        break;
+      case StatusCodes.FORBIDDEN:
+        store.dispatch(
+          showError(
+            "You do not have permission to access the requested resource"
+          )
+        );
+        break;
+      default:
+        store.dispatch(unexpectedError());
     }
+  }
 
-    return result;
-  };
-
-export const catchAuthFailure: Middleware =
-  (store) =>
-  (next) =>
-  <A extends Action>(action: A) => {
-    try {
-      return next(action);
-    } catch (err: any) {
-      switch (err.status) {
-        case 401:
-          store.dispatch(logout);
-          break;
-        default:
-          throw err;
-      }
-    }
-  };
+  return next(action);
+};
