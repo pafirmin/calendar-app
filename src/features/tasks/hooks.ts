@@ -22,26 +22,24 @@ export function useFetchTasks(initialState: TaskFilter = {}) {
     setTasksFilter(omitBy({ ...tasksFilter, newState }, isNil));
   };
 
-  const tasksByDate = useMemo(() =>
-      tasks
-        .reduce<Record<string, Task[]>>((obj, task) => {
-          const date = task.datetime.slice(0, 10);
+  const tasksByDate = useMemo(() => {
+    return tasks.reduce<Record<string, Task[]>>((obj, task) => {
+      const date = task.datetime.slice(0, 10);
 
-          if (obj[date]) {
-            obj[date].push(task);
+      if (obj[date]) {
+        obj[date].push(task);
 
-            return obj;
-          }
+        return obj;
+      }
 
-          obj[date] = new Array(task);
+      obj[date] = new Array(task);
 
-          return obj;
-        }, {}),
-    [tasks]
-  );
+      return obj;
+    }, {});
+  }, [tasks]);
 
   const handleFetchTasks = useCallback(async () => {
-    dispatch(fetchTasks({...tasksFilter, folder_id: selected}));
+    dispatch(fetchTasks({ ...tasksFilter, folder_id: selected }));
   }, [tasksFilter, dispatch, selected]);
 
   useEffect(() => {

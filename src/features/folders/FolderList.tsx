@@ -7,7 +7,6 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -15,8 +14,9 @@ import FolderIcon from "@mui/icons-material/Folder";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { createFolder, toggleSelected } from "./folders.slice";
-import { ChangeEvent, FormEvent, Fragment, useState } from "react";
+import { toggleSelected } from "./folders.slice";
+import { Fragment, useState } from "react";
+import NewFolderForm from "./NewFolderForm";
 
 const FolderList = () => {
   const dispatch = useAppDispatch();
@@ -24,39 +24,8 @@ const FolderList = () => {
     (state) => state.folders
   );
   const [inputActive, setInputActive] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
-  const [inputError, setInputError] = useState("");
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewFolderName(e.currentTarget.value);
-  };
-
-  const handleToggleInput = () => {
-    if (!inputActive) {
-      setInputActive(true);
-    } else {
-      setInputActive(false);
-      setInputError("");
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!newFolderName) {
-      setInputError("Folder name cannot be empty");
-    }
-
-    try {
-      await dispatch(createFolder({ name: newFolderName })).unwrap();
-
-      setNewFolderName("");
-      setInputError("");
-      setInputActive(false);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const handleToggleInput = () => setInputActive(!inputActive);
 
   return (
     <Fragment>
@@ -97,22 +66,7 @@ const FolderList = () => {
       <List sx={{ height: "100%", overflowY: "scroll" }}>
         {inputActive && (
           <ListItem>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              sx={{ width: "100%" }}
-            >
-              <TextField
-                fullWidth
-                autoFocus
-                label="Folder name"
-                name="new-folder-name"
-                value={newFolderName}
-                onChange={handleChange}
-                helperText={inputError}
-                error={Boolean(inputError)}
-              />
-            </Box>
+            <NewFolderForm />
           </ListItem>
         )}
         {folders.map((folder) => (

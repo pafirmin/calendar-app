@@ -1,12 +1,16 @@
 import { isRejectedWithValue, Middleware } from "@reduxjs/toolkit";
 import { StatusCodes } from "http-status-codes";
 import { showError, unexpectedError } from "../features/alerts/alerts.slice";
-import { logout } from "../features/auth/auth.slice";
+import { login, logout } from "../features/auth/auth.slice";
 
 export const catchAPIError: Middleware = (store) => (next) => (action) => {
   if (isRejectedWithValue(action)) {
     switch (action.payload.status) {
       case StatusCodes.UNAUTHORIZED:
+        if (login.rejected.match(action)) {
+          store.dispatch(showError("Incorrect credentials. Please try again."));
+          break;
+        }
         localStorage.clear();
         store.dispatch(logout());
         store.dispatch(

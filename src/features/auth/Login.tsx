@@ -3,7 +3,6 @@ import { StatusCodes } from "http-status-codes";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
-import { showError } from "../alerts/alerts.slice";
 import { login } from "./auth.slice";
 import { Credentials } from "./interfaces";
 
@@ -36,7 +35,7 @@ const Login = () => {
         setMessage(AUTH_FAIL_MESSAGE);
         break;
       default:
-        dispatch(showError(response.payload.message));
+        break;
     }
   };
 

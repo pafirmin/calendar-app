@@ -14,11 +14,7 @@ import { useEffect, useRef } from "react";
 import * as Yup from "yup";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { ValidationFailedResponse } from "../../common/types";
-import {
-  showError,
-  showSuccess,
-  unexpectedError,
-} from "../alerts/alerts.slice";
+import { showSuccess } from "../alerts/alerts.slice";
 import { CreateTaskDTO } from "./interfaces";
 import { createTask } from "./tasks.slice";
 
@@ -54,7 +50,7 @@ const NewTaskForm = () => {
 
   return (
     <Formik
-      validationSchema
+      validationSchema={validationSchema}
       initialValues={initialValues}
       validateOnChange
       validateOnBlur={false}

@@ -1,9 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { StatusCodes } from "http-status-codes";
 import { AppAPI } from "../../app/api";
 import { RootState } from "../../app/store";
 import { APIMetaData } from "../../common/interfaces";
-import { ValidationFailedResponse } from "../../common/types";
 import {
   TaskState,
   Task,
