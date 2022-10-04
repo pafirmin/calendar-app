@@ -56,6 +56,7 @@ const Layout = () => {
           sx={{
             display: "flex",
             overflowY: "hidden",
+            flexGrow: 1,
           }}
         >
           <Box

@@ -1,34 +1,65 @@
-import { Box, Typography } from "@mui/material";
-import { endOfMonth, format, getDaysInMonth, setDate } from "date-fns";
-import { range } from "../../common/utils";
-import { useCallback, useMemo, useState } from "react";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+  addDays,
+  eachDayOfInterval,
+  format,
+  getDay,
+  getDaysInMonth,
+  startOfMonth,
+} from "date-fns";
+import { ReactNode, useCallback, useMemo, useState } from "react";
 import { useFetchTasks } from "../tasks/hooks";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import CalendarDay from "./CalendarDay";
+import { toggleDrawer } from "../layout/layout.slice";
+import { useAppDispatch } from "../../app/hooks";
 
 const Calendar = () => {
+  const dispatch = useAppDispatch();
   const today = useMemo(() => new Date(), []);
-  const baseYear = today.getFullYear();
   const [month, setMonth] = useState(today.getMonth());
+  const baseDate = useMemo(
+    () => startOfMonth(new Date(today.getFullYear(), month, 1)),
+    [today, month]
+  );
+  const daysInMonth = getDaysInMonth(baseDate);
+  // Number of leading days to render
+  const offset = getDay(baseDate);
+  // Round to nearest multiple of 7 to get total no. days to render
+  const remainder = (daysInMonth + offset) % 7;
+  const totalDays = daysInMonth + offset + 7 - remainder;
+  const start = addDays(baseDate, -offset);
+  const end = addDays(start, totalDays - 1);
   const [tasks, filters] = useFetchTasks({
-    min_date: today.toISOString(),
-    max_date: endOfMonth(today).toISOString(),
+    min_date: start.toISOString(),
+    max_date: end.toISOString(),
   });
 
-  const getCalendarDays = useCallback(() => {
-    const baseDate = new Date(baseYear, month, 1);
+  const handleClick = () => {
+    dispatch(toggleDrawer({ anchor: "right", open: true }));
+  };
 
-    return range(1, getDaysInMonth(baseDate) + 1).map((day) => {
-      const tasksOnDay = tasks[format(setDate(baseDate, day), "yyyy-MM-dd")];
-
-      return <CalendarDay key={day} day={day} tasks={tasksOnDay || []} />;
-    });
-  }, [baseYear, month, tasks]);
+  const getCalendarDays = useCallback(
+    (): ReactNode[] =>
+      eachDayOfInterval({ start, end }).map((date) => (
+        <CalendarDay
+          blank={date.getMonth() !== baseDate.getMonth()}
+          key={date.toISOString()}
+          day={date.getDate()}
+          tasks={tasks[format(date, "yyy-MM-dd")]}
+        />
+      )),
+    [baseDate, end, start, tasks]
+  );
 
   return (
     <Box
       component="article"
       sx={{
         marginLeft: { sm: 4 },
+        marginRight: { sm: 4 },
+        display: "flex",
+        flexDirection: "column",
         height: "100%",
       }}
     >
@@ -42,20 +73,22 @@ const Calendar = () => {
         }}
       >
         <Typography variant="h2">Your calendar</Typography>
+        <Tooltip title="Add a new event">
+          <IconButton onClick={handleClick}>
+            <NoteAddIcon color="secondary" />
+          </IconButton>
+        </Tooltip>
       </Box>
-      <Box sx={{ height: "100%", overflowY: "scroll", marginTop: 1 }}>
-        <Box
-          sx={(theme) => ({
-            display: "grid",
-            gridTemplateColumns: "repeat(7, 1fr)",
-            maxWidth: 1600,
-            backgroundColor: theme.palette.primary.main,
-            gap: "1px",
-            padding: "1px",
-          })}
-        >
-          {getCalendarDays()}
-        </Box>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: "2px",
+          height: "100%",
+          flexGrow: 1,
+        }}
+      >
+        {getCalendarDays()}
       </Box>
     </Box>
   );

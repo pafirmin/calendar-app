@@ -1,31 +1,17 @@
-import { styled } from "@mui/material";
+import { Box, styled } from "@mui/material";
 import { Task } from "../tasks/interfaces";
-
-const Wrapper = styled("div")(({ theme }) => ({
-  padding: "50% 0",
-  height: 0,
-  position: "relative",
-  backgroundColor: "#fff",
-}));
-
-const DayContent = styled("div")((theme) => ({
-  position: "absolute",
-  top: 0,
-  left: 0,
-  height: "100%",
-  width: "100%",
-}));
 
 interface Props {
   tasks: Task[];
   day: number;
+  blank?: boolean;
 }
 
-const CalendarDay = ({ tasks, day }: Props) => {
+const CalendarDay = ({ tasks = [], day, blank }: Props) => {
   return (
-    <Wrapper>
-      <DayContent>{day}</DayContent>
-    </Wrapper>
+    <Box sx={{ padding: 1, backgroundColor: blank ? "#f1f1f1" : "#fff" }}>
+      {day}
+    </Box>
   );
 };
 
