@@ -99,9 +99,9 @@ const taskSlice = createSlice({
   reducers: {
     setNewTaskDate: (
       state,
-      { payload }: PayloadAction<{ datetime: string }>
+      { payload }: PayloadAction<string>
     ) => {
-      state.newTaskDate = payload.datetime;
+      state.newTaskDate = payload;
     },
   },
   extraReducers: (builder) => {
@@ -130,5 +130,7 @@ const taskSlice = createSlice({
       });
   },
 });
+
+export const { setNewTaskDate } = taskSlice.actions;
 
 export default taskSlice.reducer;

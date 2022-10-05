@@ -14,8 +14,7 @@ const lightPalette: PaletteOptions = {
     main: "#287459",
     light: "#4A9077",
     dark: "#013B27",
-
-  }
+  },
 };
 
 const darkPalette: PaletteOptions = {

@@ -152,6 +152,7 @@ const NewTaskForm = () => {
                     {...props}
                   />
                 )}
+                inputFormat="dd/MM/yyyy HH:mm"
                 label="When?"
                 value={formik.values.datetime}
                 onChange={(val) => formik.setFieldValue("datetime", val)}

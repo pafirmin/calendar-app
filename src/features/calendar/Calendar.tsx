@@ -1,26 +1,36 @@
-import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import {
   addDays,
   eachDayOfInterval,
   format,
   getDay,
   getDaysInMonth,
+  isToday,
   startOfMonth,
 } from "date-fns";
-import { ReactNode, useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useFetchTasks } from "../tasks/hooks";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import CalendarDay from "./CalendarDay";
 import { toggleDrawer } from "../layout/layout.slice";
-import { useAppDispatch } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+
+const DAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 const Calendar = () => {
   const dispatch = useAppDispatch();
-  const today = useMemo(() => new Date(), []);
-  const [month, setMonth] = useState(today.getMonth());
+  const { selectedDate } = useAppSelector((state) => state.monthPicker);
   const baseDate = useMemo(
-    () => startOfMonth(new Date(today.getFullYear(), month, 1)),
-    [today, month]
+    () => startOfMonth(new Date(selectedDate)),
+    [selectedDate]
   );
   const daysInMonth = getDaysInMonth(baseDate);
   // Number of leading days to render
@@ -30,6 +40,11 @@ const Calendar = () => {
   const totalDays = daysInMonth + offset + 7 - remainder;
   const start = addDays(baseDate, -offset);
   const end = addDays(start, totalDays - 1);
+  const dateRange = useMemo(
+    () => eachDayOfInterval({ start, end }),
+    [end, start]
+  );
+
   const [tasks, filters] = useFetchTasks({
     min_date: start.toISOString(),
     max_date: end.toISOString(),
@@ -39,28 +54,15 @@ const Calendar = () => {
     dispatch(toggleDrawer({ anchor: "right", open: true }));
   };
 
-  const getCalendarDays = useCallback(
-    (): ReactNode[] =>
-      eachDayOfInterval({ start, end }).map((date) => (
-        <CalendarDay
-          blank={date.getMonth() !== baseDate.getMonth()}
-          key={date.toISOString()}
-          day={date.getDate()}
-          tasks={tasks[format(date, "yyy-MM-dd")]}
-        />
-      )),
-    [baseDate, end, start, tasks]
-  );
-
   return (
     <Box
       component="article"
       sx={{
+        height: "100%",
         marginLeft: { sm: 4 },
         marginRight: { sm: 4 },
         display: "flex",
         flexDirection: "column",
-        height: "100%",
       }}
     >
       <Box
@@ -72,9 +74,9 @@ const Calendar = () => {
           zIndex: 100,
         }}
       >
-        <Typography variant="h2">Your calendar</Typography>
+        <Typography variant="h2">{format(baseDate, "MMMM, yyyy")}</Typography>
         <Tooltip title="Add a new event">
-          <IconButton onClick={handleClick}>
+          <IconButton aria-label="add a task" onClick={handleClick}>
             <NoteAddIcon color="secondary" />
           </IconButton>
         </Tooltip>
@@ -82,13 +84,36 @@ const Calendar = () => {
       <Box
         sx={{
           display: "grid",
+          marginTop: 1,
           gridTemplateColumns: "repeat(7, 1fr)",
+          gridTemplateRows: "40px repeat(auto-fit, minmax(0, 1fr))",
           gap: "2px",
-          height: "100%",
+          minWidth: "1200px",
           flexGrow: 1,
         }}
       >
-        {getCalendarDays()}
+        {DAYS.map((day) => (
+          <Box
+            key={day}
+            sx={(theme) => ({
+              padding: 1,
+              color: "#fff",
+              fontWeight: "bold",
+              backgroundColor: theme.palette.primary.light,
+            })}
+          >
+            {day}
+          </Box>
+        ))}
+        {dateRange.map((date) => (
+          <CalendarDay
+            key={date.toISOString()}
+            date={date}
+            tasks={tasks[format(date, "yyy-MM-dd")]}
+            isToday={isToday(date)}
+            isCurrMonth={date.getMonth() === baseDate.getMonth()}
+          />
+        ))}
       </Box>
     </Box>
   );

@@ -4,6 +4,7 @@ import tasksReducer from "../features/tasks/tasks.slice";
 import authReducer from "../features/auth/auth.slice";
 import alertsReducer from "../features/alerts/alerts.slice";
 import layoutReducer from "../features/layout/layout.slice";
+import monthPickerReducer from "../features/month-picker/month-picker.slice";
 import appApi from "./api";
 import {catchAPIError} from "../common/middleware";
 
@@ -14,6 +15,7 @@ export const store = configureStore({
     auth: authReducer,
     alerts: alertsReducer,
     layout: layoutReducer,
+    monthPicker: monthPickerReducer,
   },
   middleware: (defaults) => {
     return defaults({
