@@ -18,9 +18,16 @@ interface Props {
   date: Date;
   isToday?: boolean;
   isCurrMonth?: boolean;
+  handleClickTask: (task: Task) => void;
 }
 
-const CalendarDay = ({ tasks = [], date, isToday, isCurrMonth }: Props) => {
+const CalendarDay = ({
+  tasks = [],
+  date,
+  isToday,
+  isCurrMonth,
+  handleClickTask,
+}: Props) => {
   const dispatch = useAppDispatch();
 
   const handleClick = () => {
@@ -48,7 +55,7 @@ const CalendarDay = ({ tasks = [], date, isToday, isCurrMonth }: Props) => {
         {tasks.map((task) => (
           <Typography key={task.id} fontSize=".9rem" component="li">
             <time>{format(new Date(task.datetime), "HH:mm")} </time>
-            {task.title}
+            <span onClick={() => handleClickTask(task)}>{task.title}</span>
           </Typography>
         ))}
       </List>
