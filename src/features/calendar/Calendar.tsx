@@ -1,4 +1,4 @@
-import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   addDays,
   eachDayOfInterval,
@@ -8,12 +8,11 @@ import {
   isToday,
   startOfMonth,
 } from "date-fns";
-import { useMemo, useState } from "react";
-import { useFetchTasks } from "../tasks/hooks";
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import { useCallback, useEffect, useMemo } from "react";
 import CalendarDay from "./CalendarDay";
-import { toggleDrawer } from "../layout/layout.slice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { fetchTasks } from "../tasks/tasks.slice";
+import { tasksByDate } from "../tasks/utils";
 
 const DAYS = [
   "Sunday",
@@ -27,7 +26,12 @@ const DAYS = [
 
 const Calendar = () => {
   const dispatch = useAppDispatch();
-  const { selectedDate } = useAppSelector((state) => state.monthPicker);
+  const selected = useAppSelector(({ folders }) => folders.selected);
+  const selectedDate = useAppSelector(
+    ({ monthPicker }) => monthPicker.selectedDate
+  );
+  const tasks = useAppSelector(({ tasks }) => tasks.entities);
+
   const baseDate = useMemo(
     () => startOfMonth(new Date(selectedDate)),
     [selectedDate]
@@ -38,68 +42,66 @@ const Calendar = () => {
   // Round to nearest multiple of 7 to get total no. days to render
   const remainder = (daysInMonth + offset) % 7;
   const totalDays = daysInMonth + offset + 7 - remainder;
-  const start = addDays(baseDate, -offset);
-  const end = addDays(start, totalDays - 1);
+  const start = useMemo(() => addDays(baseDate, -offset), [baseDate, offset]);
+  const end = useMemo(() => addDays(start, totalDays - 1), [start, totalDays]);
   const dateRange = useMemo(
     () => eachDayOfInterval({ start, end }),
     [end, start]
   );
 
-  const [tasks, filters] = useFetchTasks({
-    min_date: start.toISOString(),
-    max_date: end.toISOString(),
-  });
+  const tasksMap = useMemo(() => tasksByDate(tasks), [tasks]);
 
-  const handleClick = () => {
-    dispatch(toggleDrawer({ anchor: "right", open: true }));
-  };
+  const handleFetchTasks = useCallback(async () => {
+    dispatch(
+      fetchTasks({
+        min_date: format(start, "yyyy-MM-dd"),
+        max_date: format(end, "yyyy-MM-dd"),
+        folder_id: selected,
+      })
+    );
+  }, [start, end, selected, dispatch]);
+
+  useEffect(() => {
+    if (selected.length > 0) {
+      handleFetchTasks();
+    }
+  }, [handleFetchTasks, selected.length]);
 
   return (
     <Box
-      component="article"
       sx={{
-        height: "100%",
-        marginLeft: { sm: 4 },
-        marginRight: { sm: 4 },
+        width: "100%",
+        overflowX: "scroll",
+        overflowY: "scroll",
         display: "flex",
         flexDirection: "column",
+        flexGrow: 1,
       }}
     >
       <Box
-        component="header"
-        sx={{
-          paddingTop: 1,
-          display: "flex",
-          alignItems: "center",
-          zIndex: 100,
-        }}
-      >
-        <Typography variant="h2">{format(baseDate, "MMMM, yyyy")}</Typography>
-        <Tooltip title="Add a new event">
-          <IconButton aria-label="add a task" onClick={handleClick}>
-            <NoteAddIcon color="secondary" />
-          </IconButton>
-        </Tooltip>
-      </Box>
-      <Box
         sx={{
           display: "grid",
-          marginTop: 1,
+          position: "relative",
           gridTemplateColumns: "repeat(7, 1fr)",
           gridTemplateRows: "40px repeat(auto-fit, minmax(0, 1fr))",
           gap: "2px",
+          height: "100%",
           minWidth: "1200px",
-          flexGrow: 1,
+          minHeight: 900,
+          paddingBottom: 1,
         }}
       >
         {DAYS.map((day) => (
           <Box
             key={day}
             sx={(theme) => ({
+              position: "sticky",
+              top: 0,
               padding: 1,
               color: "#fff",
               fontWeight: "bold",
               backgroundColor: theme.palette.primary.light,
+              zIndex: 100,
             })}
           >
             {day}
@@ -109,7 +111,7 @@ const Calendar = () => {
           <CalendarDay
             key={date.toISOString()}
             date={date}
-            tasks={tasks[format(date, "yyy-MM-dd")]}
+            tasks={tasksMap[format(date, "yyy-MM-dd")]}
             isToday={isToday(date)}
             isCurrMonth={date.getMonth() === baseDate.getMonth()}
           />

@@ -5,7 +5,7 @@ import { Task, TaskFilter } from "./interfaces";
 import { fetchTasks } from "./tasks.slice";
 
 export function useFetchTasks(initialState: TaskFilter = {}) {
-  const [tasksFilter, setTasksFilter] = useState<TaskFilter>(initialState);
+  const [filter, setFilter] = useState<TaskFilter>(initialState);
   const dispatch = useAppDispatch();
   const selected = useAppSelector(({ folders }) => folders.selected);
   const { entities: tasks } = useAppSelector(({ tasks }) => tasks);
@@ -14,12 +14,12 @@ export function useFetchTasks(initialState: TaskFilter = {}) {
     let newState: TaskFilter;
 
     if (typeof f === "function") {
-      newState = f(tasksFilter);
+      newState = f(filter);
     } else {
       newState = f;
     }
 
-    setTasksFilter(omitBy({ ...tasksFilter, newState }, isNil));
+    setFilter(omitBy({ ...filter, newState }, isNil));
   };
 
   const tasksByDate = useMemo(() => {
@@ -39,8 +39,8 @@ export function useFetchTasks(initialState: TaskFilter = {}) {
   }, [tasks]);
 
   const handleFetchTasks = useCallback(async () => {
-    dispatch(fetchTasks({ ...tasksFilter, folder_id: selected }));
-  }, [tasksFilter, dispatch, selected]);
+    dispatch(fetchTasks({ ...filter, folder_id: selected }));
+  }, [filter, dispatch, selected]);
 
   useEffect(() => {
     if (selected.length > 0) {
@@ -48,5 +48,5 @@ export function useFetchTasks(initialState: TaskFilter = {}) {
     }
   }, [dispatch, handleFetchTasks, selected.length]);
 
-  return [tasksByDate, { values: tasksFilter, set: setTaskFilter }] as const;
+  return {tasks: tasksByDate, tasksFilter: filter, setTaskFilter}
 }

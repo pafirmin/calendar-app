@@ -16,14 +16,14 @@ const MonthPicker = () => {
   const date = useMemo(() => new Date(selectedDate), [selectedDate]);
 
   const handlePickMonth = (val: Date) => {
-    dispatch(setSelectedDate(val));
+    dispatch(setSelectedDate(val.toISOString()));
   };
 
   const handlePickYear = (num: number) => {
     const newDate = date;
     newDate.setFullYear(date.getFullYear() + num);
 
-    dispatch(setSelectedDate(newDate));
+    dispatch(setSelectedDate(newDate.toISOString()));
   };
 
   return (

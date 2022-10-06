@@ -16,11 +16,12 @@ import FolderList from "../folders/FolderList";
 import { fetchFolders } from "../folders/folders.slice";
 import MonthPicker from "../month-picker/MonthPicker";
 import NewTaskForm from "../tasks/NewTaskForm";
+import TasksWrapper from "../tasks/TasksWrapper";
 import { toggleDrawer } from "./layout.slice";
 
-const folderMenuWidth = 340;
-const taskMenuWidth = 430;
-const appBarHeight = 64;
+const LEFT_DRAWER_WIDTH = 340;
+const RIGHT_DRAWER_WIDTH = 430;
+const APP_BAR_HEIGHT = 64;
 
 const Layout = () => {
   const theme = useTheme();
@@ -37,7 +38,7 @@ const Layout = () => {
       <AppBar
         position="fixed"
         sx={(theme) => ({
-          height: appBarHeight,
+          height: APP_BAR_HEIGHT,
           zIndex: theme.zIndex.drawer + 1,
         })}
       >
@@ -51,13 +52,12 @@ const Layout = () => {
         sx={{
           display: "flex",
           overflowY: "hidden",
-          flexGrow: 1,
         }}
       >
         <Box
           component="aside"
           sx={{
-            width: { md: folderMenuWidth },
+            width: { md: LEFT_DRAWER_WIDTH },
             flexShrink: { md: 0 },
             height: "100%",
           }}
@@ -70,9 +70,9 @@ const Layout = () => {
             }
             sx={{
               "& .MuiDrawer-paper": {
-                marginTop: `${appBarHeight}px`,
+                marginTop: `${APP_BAR_HEIGHT}px`,
                 boxSizing: "border-box",
-                width: folderMenuWidth,
+                width: LEFT_DRAWER_WIDTH,
               },
             }}
           >
@@ -86,12 +86,15 @@ const Layout = () => {
         <Box
           component="main"
           sx={{
-            marginTop: `${appBarHeight}px`,
-            height: `calc(100vh - ${appBarHeight}px)`,
-            width: { md: `calc(100% - ${folderMenuWidth}px)` },
+            flexGrow: 1,
+            marginTop: `${APP_BAR_HEIGHT}px`,
+            height: `calc(100vh - ${APP_BAR_HEIGHT}px)`,
+            width: { md: `calc(100% - ${LEFT_DRAWER_WIDTH}px)` },
           }}
         >
-          <Outlet />
+          <TasksWrapper>
+            <Outlet />
+          </TasksWrapper>
         </Box>
         <Box component="aside" sx={{ flexShrink: 0 }}>
           <Drawer
@@ -103,8 +106,8 @@ const Layout = () => {
             }
             sx={{
               "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: taskMenuWidth,
+                marginTop: `${APP_BAR_HEIGHT}px`,
+                width: RIGHT_DRAWER_WIDTH,
                 maxWidth: "100vw",
                 padding: 4,
               },

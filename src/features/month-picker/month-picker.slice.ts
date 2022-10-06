@@ -8,8 +8,8 @@ const monthPickerSlice = createSlice({
   name: "month-picker",
   initialState,
   reducers: {
-    setSelectedDate: (state, { payload }: PayloadAction<Date>) => {
-      state.selectedDate = payload.toISOString();
+    setSelectedDate: (state, { payload }: PayloadAction<string>) => {
+      state.selectedDate = payload;
     },
   },
 });
