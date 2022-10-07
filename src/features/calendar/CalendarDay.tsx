@@ -1,6 +1,7 @@
 import {
   Box,
   IconButton,
+  Link,
   List,
   Stack,
   Tooltip,
@@ -55,7 +56,13 @@ const CalendarDay = ({
         {tasks.map((task) => (
           <Typography key={task.id} fontSize=".9rem" component="li">
             <time>{format(new Date(task.datetime), "HH:mm")} </time>
-            <span onClick={() => handleClickTask(task)}>{task.title}</span>
+            <Link
+              sx={{ cursor: "pointer" }}
+              component="span"
+              onClick={() => handleClickTask(task)}
+            >
+              {task.title}
+            </Link>
           </Typography>
         ))}
       </List>

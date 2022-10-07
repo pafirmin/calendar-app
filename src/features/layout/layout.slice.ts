@@ -3,7 +3,7 @@ import {LayoutState} from "./interfaces";
 
 const initialState: LayoutState = {
   drawers: {
-    left: true,
+    left: false,
     right: false,
   },
   theme: "light"

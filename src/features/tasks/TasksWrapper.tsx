@@ -26,8 +26,6 @@ const TasksWrapper = ({ children }: Props) => {
       sx={{
         height: "100%",
         maxWidth: "100vw",
-        marginLeft: { sm: 4 },
-        marginRight: { md: 4 },
         display: "flex",
         flexDirection: "column",
       }}
@@ -36,6 +34,7 @@ const TasksWrapper = ({ children }: Props) => {
         component="header"
         sx={{
           flexGrow: 0,
+          paddingLeft: 2,
           paddingTop: 1,
           left: 0,
           display: "flex",

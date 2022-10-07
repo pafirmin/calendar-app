@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppAPI } from "../../app/api";
-import { RootState } from "../../app/store";
 import { APIMetaData } from "../../common/interfaces";
 import {
   TaskState,
@@ -35,20 +34,6 @@ export const fetchTasks = createAsyncThunk<
   } catch (err) {
     return rejectWithValue(err);
   }
-});
-
-export const nextPage = createAsyncThunk<
-  { metadata: APIMetaData; tasks: Task[] },
-  TaskFilter,
-  { extra: AppAPI }
->("tasks/fetch", async (payload, { getState, extra: api }) => {
-  const { tasks } = getState() as RootState;
-  const res = await api.tasks.fetchTasks({
-    ...payload,
-    page: tasks.metadata.current_page + 1,
-  });
-
-  return res.data;
 });
 
 export const createTask = createAsyncThunk<

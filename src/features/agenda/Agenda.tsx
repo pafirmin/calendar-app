@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { List, ListItem, Typography } from "@mui/material";
-import Task from "./Task";
 import { Box } from "@mui/system";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchTasks } from "./tasks.slice";
-import { tasksByDate } from "./utils";
+import { fetchTasks } from "../tasks/tasks.slice";
+import { tasksByDate } from "../tasks/utils";
+import AgendaItem from "./AgendaItem";
 
-const TasksList = () => {
+const Agenda = () => {
   const dispatch = useAppDispatch();
   const { selectedDate } = useAppSelector((state) => state.monthPicker);
   const selected = useAppSelector(({ folders }) => folders.selected);
-  const tasks = useAppSelector(({ tasks }) => tasks.entities);
+  const { entities: tasks, loading } = useAppSelector(({ tasks }) => tasks);
 
   const tasksMap = useMemo(() => tasksByDate(tasks), [tasks]);
 
@@ -31,14 +31,27 @@ const TasksList = () => {
     handleFetchTasks();
   }, [handleFetchTasks]);
 
+  if (!loading && !tasks.length) {
+    return (
+      <Typography
+        align="center"
+        marginTop={4}
+        fontSize="1.5rem"
+        color="text.secondary"
+      >
+        Nothing planned... Yet!
+      </Typography>
+    );
+  }
+
   return (
     <List
       sx={{
         height: "100%",
         overflowY: "scroll",
+        paddingBottom: 4,
         paddingLeft: 2,
         paddingRight: 2,
-        paddingBottom: 4,
       }}
       component="ol"
     >
@@ -52,7 +65,7 @@ const TasksList = () => {
             <List component="ol">
               {tasksMap[date].map((task) => (
                 <ListItem key={task.id} disableGutters>
-                  <Task task={task} />
+                  <AgendaItem task={task} />
                 </ListItem>
               ))}
             </List>
@@ -62,4 +75,4 @@ const TasksList = () => {
   );
 };
 
-export default TasksList;
+export default Agenda;

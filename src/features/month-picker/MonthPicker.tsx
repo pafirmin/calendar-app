@@ -9,6 +9,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { setSelectedDate } from "./month-picker.slice";
 import { useMemo } from "react";
+import { toggleDrawer } from "../layout/layout.slice";
 
 const MonthPicker = () => {
   const dispatch = useAppDispatch();
@@ -17,6 +18,7 @@ const MonthPicker = () => {
 
   const handlePickMonth = (val: Date) => {
     dispatch(setSelectedDate(val.toISOString()));
+    dispatch(toggleDrawer({ anchor: "left", open: false }));
   };
 
   const handlePickYear = (num: number) => {

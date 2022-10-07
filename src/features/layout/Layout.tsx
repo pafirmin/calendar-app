@@ -1,15 +1,18 @@
+import { Menu } from "@mui/icons-material";
 import {
   AppBar,
   Box,
   Divider,
   Drawer,
+  Fab,
+  SwipeableDrawer,
   Toolbar,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Fragment, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Fragment, useEffect, useRef } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import RequireAuth from "../auth/RequireAuth";
 import FolderList from "../folders/FolderList";
@@ -28,6 +31,17 @@ const Layout = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useAppDispatch();
   const { drawers } = useAppSelector((state) => state.layout);
+  const navigate = useNavigate();
+  const didRenderRef = useRef(false);
+
+  // On initial render, redirect to agenda view if on small screen
+  useEffect(() => {
+    if (isMobile && !didRenderRef.current) {
+      navigate("/agenda");
+    }
+
+    didRenderRef.current = true;
+  }, [isMobile, didRenderRef, navigate]);
 
   useEffect(() => {
     dispatch(fetchFolders({ sort: "name" }));
@@ -62,11 +76,14 @@ const Layout = () => {
             height: "100%",
           }}
         >
-          <Drawer
+          <SwipeableDrawer
             variant={isMobile ? "temporary" : "permanent"}
             open={drawers.left}
             onClose={() =>
               dispatch(toggleDrawer({ anchor: "left", open: false }))
+            }
+            onOpen={() =>
+              dispatch(toggleDrawer({ anchor: "left", open: true }))
             }
             sx={{
               "& .MuiDrawer-paper": {
@@ -81,7 +98,7 @@ const Layout = () => {
               <Divider />
               <FolderList />
             </Fragment>
-          </Drawer>
+          </SwipeableDrawer>
         </Box>
         <Box
           component="main"
@@ -117,6 +134,15 @@ const Layout = () => {
           </Drawer>
         </Box>
       </Box>
+      {isMobile && (
+        <Fab
+          onClick={() => dispatch(toggleDrawer({ anchor: "left", open: true }))}
+          color="primary"
+          sx={{ position: "fixed", bottom: 40, right: 40 }}
+        >
+          <Menu />
+        </Fab>
+      )}
     </RequireAuth>
   );
 };
