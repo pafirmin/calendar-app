@@ -34,3 +34,11 @@ export const catchAPIError: Middleware = (store) => (next) => (action) => {
 
   return next(action);
 };
+
+export const clearLocalStorage: Middleware = () => (next) => (action) => {
+  if (logout.match(action)) {
+    localStorage.clear();
+  }
+
+  return next(action);
+};

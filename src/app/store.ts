@@ -6,7 +6,7 @@ import alertsReducer from "../features/alerts/alerts.slice";
 import layoutReducer from "../features/layout/layout.slice";
 import monthPickerReducer from "../features/month-picker/month-picker.slice";
 import appApi from "./api";
-import {catchAPIError} from "../common/middleware";
+import {catchAPIError, clearLocalStorage} from "../common/middleware";
 
 export const store = configureStore({
   reducer: {
@@ -22,7 +22,7 @@ export const store = configureStore({
       thunk: {
         extraArgument: appApi
       }
-    }).concat(catchAPIError)
+    }).concat(clearLocalStorage, catchAPIError)
   }
 });
 

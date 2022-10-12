@@ -18,7 +18,6 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { logout } from "../auth/auth.slice";
 import RequireAuth from "../auth/RequireAuth";
 import FolderList from "../folders/FolderList";
-import { fetchFolders } from "../folders/folders.slice";
 import MonthPicker from "../month-picker/MonthPicker";
 import NewTaskForm from "../tasks/NewTaskForm";
 import TasksWrapper from "../tasks/TasksWrapper";
@@ -45,10 +44,6 @@ const Layout = () => {
 
     didRenderRef.current = true;
   }, [isMobile, didRenderRef, navigate]);
-
-  useEffect(() => {
-    dispatch(fetchFolders({ sort: "name" }));
-  }, [dispatch]);
 
   return (
     <RequireAuth>

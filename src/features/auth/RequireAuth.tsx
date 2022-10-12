@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchUser } from "./auth.slice";
@@ -11,25 +11,26 @@ const RequireAuth = ({ children }: Props) => {
   const { user, token } = useAppSelector(({ auth }) => auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-
-  const authenticate = useCallback(async () => {
-    setLoading(true);
-    await dispatch(fetchUser());
-    setLoading(false);
-  }, [dispatch]);
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
 
   useEffect(() => {
+    const authenticate = async () => {
+      await dispatch(fetchUser()).unwrap();
+    };
+
     if (!token) {
       // We know auth will fail - go to login page
       navigate("/login");
     } else if (!user) {
-      // Attempt to authenticate user
+      // Attempt to authenticate user with existing token
       authenticate();
+    } else {
+      // User is authenticated
+      setIsAuthenticating(false);
     }
-  }, [user, token, navigate, authenticate, dispatch]);
+  }, [user, token, navigate, dispatch]);
 
-  if (loading) {
+  if (isAuthenticating) {
     return null;
   }
 

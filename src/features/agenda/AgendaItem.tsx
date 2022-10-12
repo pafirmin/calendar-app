@@ -1,4 +1,4 @@
-import { Box, Collapse, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { truncate } from "lodash";
 import { useState } from "react";

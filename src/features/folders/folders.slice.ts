@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { StatusCodes } from "http-status-codes";
 import { AppAPI } from "../../app/api";
 import { APIMetaData } from "../../common/interfaces";
-import { FieldErrors, ValidationFailedResponse } from "../../common/types";
 import {
   FolderState,
   FolderFilter,
