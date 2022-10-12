@@ -32,4 +32,5 @@ export interface AuthAPI {
   ) => Promise<AxiosResponse<{ access_token: string; user: User }>>;
   createUser: (c: CreateUserDTO) => Promise<AxiosResponse<{user: User}>>,
   fetchUser: () => Promise<AxiosResponse<{ user: User }>>
+  guestLogin: () => Promise<AxiosResponse<{ access_token: string; user: User }>>;
 }

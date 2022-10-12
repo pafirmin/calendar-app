@@ -2,6 +2,7 @@ import { Menu } from "@mui/icons-material";
 import {
   AppBar,
   Box,
+  Button,
   Divider,
   Drawer,
   Fab,
@@ -14,6 +15,7 @@ import {
 import { Fragment, useEffect, useRef } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { logout } from "../auth/auth.slice";
 import RequireAuth from "../auth/RequireAuth";
 import FolderList from "../folders/FolderList";
 import { fetchFolders } from "../folders/folders.slice";
@@ -30,6 +32,7 @@ const Layout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useAppDispatch();
+  const first_name = useAppSelector((state) => state.auth.user?.first_name);
   const { drawers } = useAppSelector((state) => state.layout);
   const navigate = useNavigate();
   const didRenderRef = useRef(false);
@@ -56,10 +59,19 @@ const Layout = () => {
           zIndex: theme.zIndex.drawer + 1,
         })}
       >
-        <Toolbar>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h1" fontSize="3rem">
             GoToDo
           </Typography>
+          <Button sx={{ color: "#fff" }} onClick={() => dispatch(logout())}>
+            Logout {first_name}
+          </Button>
         </Toolbar>
       </AppBar>
       <Box

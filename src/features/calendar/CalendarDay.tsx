@@ -38,11 +38,13 @@ const CalendarDay = ({
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         padding: "0 8px 8px 8px",
         border: isToday ? "1px solid red" : "",
-        backgroundColor: isCurrMonth ? "#fff" : "#f1f1f1",
-      }}
+        backgroundColor: isCurrMonth
+          ? theme.palette.background.paper
+          : "#f1f1f1",
+      })}
     >
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography fontWeight="bold">{date.getDate()}</Typography>
