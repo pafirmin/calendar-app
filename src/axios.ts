@@ -6,6 +6,7 @@ const axios = Axios.create({
   headers: {
     "content-type": "application/json",
   },
+  withCredentials: true,
 });
 
 axios.defaults.baseURL = process.env.REACT_APP_API_BASE;
@@ -25,6 +26,8 @@ axios.interceptors.response.use(
     return response;
   },
   async (error) => {
+    const config = error.config;
+
     if (error.response) {
       switch (error.response.status) {
         case StatusCodes.UNPROCESSABLE_ENTITY:
@@ -33,6 +36,26 @@ axios.interceptors.response.use(
             message: error.response.data.message,
             fields: error.response.data.fields,
           } as ValidationFailedResponse<any>);
+        case StatusCodes.UNAUTHORIZED:
+          if (
+            config._retry ||
+            config.url === "/auth/refresh-token" ||
+            config.url === "/auth/login"
+          ) {
+            return Promise.reject({
+              status: error.response.status,
+              message: error.response.data.message,
+            });
+          }
+
+          config._retry = true;
+
+          const res = await axios.get("/auth/refresh-token");
+          const token = res.data.access_token;
+
+          localStorage.setItem("access_token", token);
+
+          return axios(config);
         default:
           return Promise.reject({
             status: error.response.status,

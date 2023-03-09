@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchFolders, toggleSelected } from "./folders.slice";
 import { Fragment, useEffect, useState } from "react";
 import NewFolderForm from "./NewFolderForm";
+import FolderListItem from "./FolderListItem";
 
 const FolderList = () => {
   const dispatch = useAppDispatch();
@@ -74,18 +75,12 @@ const FolderList = () => {
           </ListItem>
         )}
         {folders.map((folder) => (
-          <MenuItem
+          <FolderListItem
             key={folder.id}
-            sx={{ justifyContent: "space-between" }}
+            folder={folder}
             selected={selected.includes(folder.id)}
-            onClick={() => dispatch(toggleSelected(folder))}
-          >
-            <ListItemIcon>
-              <FolderIcon />
-            </ListItemIcon>
-            <ListItemText>{folder.name}</ListItemText>
-            <Checkbox checked={selected.includes(folder.id)} />
-          </MenuItem>
+            handleClick={() => dispatch(toggleSelected(folder))}
+          />
         ))}
       </List>
     </Fragment>

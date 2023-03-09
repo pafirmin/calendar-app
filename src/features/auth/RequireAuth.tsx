@@ -15,7 +15,7 @@ const RequireAuth = ({ children }: Props) => {
 
   useEffect(() => {
     const authenticate = async () => {
-      await dispatch(fetchUser()).unwrap();
+      await dispatch(fetchUser());
     };
 
     if (!token) {
