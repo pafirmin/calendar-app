@@ -1,16 +1,11 @@
 import {
   Box,
-  Checkbox,
   IconButton,
   List,
   ListItem,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
   Tooltip,
   Typography,
 } from "@mui/material";
-import FolderIcon from "@mui/icons-material/Folder";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
