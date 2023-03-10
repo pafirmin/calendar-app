@@ -4,7 +4,7 @@ on:
     branches:
       - master
 jobs:
-  Explore-GitHub-Actions:
+  Build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,6 +24,6 @@ jobs:
           username: ${{ secrets.REMOTE_USERNAME }}
           port: 22
           key: ${{ secrets.PRIVATE_KEY }}
-          source: "build"
+          source: "build/*"
           target: ${{ secrets.REMOTE_PATH }}
       - run: echo "This job's status is ${{ job.status }}."
