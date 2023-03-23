@@ -21,6 +21,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchTasks } from "../tasks/tasks.slice";
 import { tasksByDate } from "../tasks/utils";
 import { Task } from "../tasks/interfaces";
+import { styled } from "@mui/system";
 
 const DAYS = [
   "Sunday",
@@ -31,6 +32,37 @@ const DAYS = [
   "Friday",
   "Saturday",
 ];
+
+const CalendarWrapper = styled(Box)(() => ({
+  width: "100%",
+  overflowX: "scroll",
+  overflowY: "scroll",
+  display: "flex",
+  flexDirection: "column",
+  flexGrow: 1,
+}));
+
+const CalendarGrid = styled(Box)(() => ({
+  display: "grid",
+  position: "relative",
+  gridTemplateColumns: "repeat(7, 1fr)",
+  gridTemplateRows: "40px repeat(auto-fit, minmax(0, 1fr))",
+  gap: "2px",
+  height: "100%",
+  minWidth: "1200px",
+  minHeight: 700,
+  paddingBottom: 1,
+}));
+
+const CalendarHeader = styled(Box)(({ theme }) => ({
+  position: "sticky",
+  top: 0,
+  gridColumn: "span 7",
+  color: "#fff",
+  fontWeight: "bold",
+  backgroundColor: theme.palette.primary.light,
+  zIndex: 100,
+}));
 
 const Calendar = () => {
   const dispatch = useAppDispatch();
@@ -51,7 +83,9 @@ const Calendar = () => {
   // Round to nearest multiple of 7 to get total no. days to render
   const remainder = (daysInMonth + offset) % 7;
   const totalDays = daysInMonth + offset + 7 - remainder;
+  // First day in range
   const start = useMemo(() => addDays(baseDate, -offset), [baseDate, offset]);
+  // Last day in range
   const end = useMemo(() => addDays(start, totalDays - 1), [start, totalDays]);
   const dateRange = useMemo(
     () => eachDayOfInterval({ start, end }),
@@ -86,7 +120,7 @@ const Calendar = () => {
       >
         <Card
           sx={{
-            position: "absolute" as "absolute",
+            position: "absolute",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
@@ -121,46 +155,14 @@ const Calendar = () => {
           </CardContent>
         </Card>
       </Modal>
-      <Box
-        sx={{
-          width: "100%",
-          overflowX: "scroll",
-          overflowY: "scroll",
-          display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
-        }}
-      >
-        <Box
-          sx={{
-            display: "grid",
-            position: "relative",
-            gridTemplateColumns: "repeat(7, 1fr)",
-            gridTemplateRows: "40px repeat(auto-fit, minmax(0, 1fr))",
-            gap: "2px",
-            height: "100%",
-            minWidth: "1200px",
-            minHeight: 900,
-            paddingBottom: 1,
-          }}
-        >
-          <Box
-            component="header"
-            sx={(theme) => ({
-              position: "sticky",
-              top: 0,
-              gridColumn: "span 7",
-              color: "#fff",
-              fontWeight: "bold",
-              backgroundColor: theme.palette.primary.light,
-              zIndex: 100,
-            })}
-          >
+      <CalendarWrapper>
+        <CalendarGrid>
+          <CalendarHeader component="header">
             {DAYS.map((day) => (
               <Box
                 key={day}
                 component="span"
-                sx={(theme) => ({
+                sx={() => ({
                   padding: 1,
                   textAlign: "center",
                   display: "inline-block",
@@ -170,7 +172,7 @@ const Calendar = () => {
                 {day}
               </Box>
             ))}
-          </Box>
+          </CalendarHeader>
           {dateRange.map((date) => (
             <CalendarDay
               key={date.toISOString()}
@@ -181,8 +183,8 @@ const Calendar = () => {
               handleClickTask={(task) => setSelectedTask(task)}
             />
           ))}
-        </Box>
-      </Box>
+        </CalendarGrid>
+      </CalendarWrapper>
     </Fragment>
   );
 };
