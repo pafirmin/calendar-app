@@ -9,8 +9,8 @@ import {
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchFolders, toggleSelected } from "./folders.slice";
-import { Fragment, useEffect, useState } from "react";
+import { toggleSelected } from "./folders.slice";
+import { Fragment, useState } from "react";
 import NewFolderForm from "./NewFolderForm";
 import FolderListItem from "./FolderListItem";
 
@@ -22,10 +22,6 @@ const FolderList = () => {
   const [inputActive, setInputActive] = useState(false);
 
   const handleToggleInput = () => setInputActive(!inputActive);
-
-  useEffect(() => {
-    dispatch(fetchFolders({ sort: "name" }));
-  }, [dispatch]);
 
   return (
     <Fragment>

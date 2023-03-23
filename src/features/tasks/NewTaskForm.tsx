@@ -15,6 +15,7 @@ import * as Yup from "yup";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { ValidationFailedResponse } from "../../common/types";
 import { showSuccess } from "../alerts/alerts.slice";
+import { toggleDrawer } from "../layout/layout.slice";
 import { CreateTaskDTO } from "./interfaces";
 import { createTask } from "./tasks.slice";
 
@@ -77,6 +78,7 @@ const NewTaskForm = () => {
             },
           });
 
+          dispatch(toggleDrawer({ anchor: "right", open: false }))
           dispatch(showSuccess("Task created!"));
         } catch (err: any) {
           console.error(err);
@@ -164,6 +166,16 @@ const NewTaskForm = () => {
               disabled={formik.isSubmitting}
             >
               Create Task
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => {
+                dispatch(toggleDrawer({ anchor: "right", open: false }));
+                formik.resetForm();
+              }}
+            >
+              Cancel
             </Button>
           </Stack>
         </Box>
