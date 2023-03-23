@@ -22,6 +22,7 @@ import { fetchTasks } from "../tasks/tasks.slice";
 import { tasksByDate } from "../tasks/utils";
 import { Task } from "../tasks/interfaces";
 import { styled } from "@mui/system";
+import TaskModal from "./TaskModal";
 
 const DAYS = [
   "Sunday",
@@ -112,49 +113,13 @@ const Calendar = () => {
 
   return (
     <Fragment>
-      <Modal
+      <TaskModal
         open={Boolean(selectedTask)}
+        selectedTask={selectedTask}
         onClose={() => setSelectedTask(null)}
         aria-labelledby="modal-task-title"
         aria-describedby="modal-task-description"
-      >
-        <Card
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "min(90vw, 600px)",
-          }}
-        >
-          <CardContent>
-            <Box
-              component="header"
-              display="flex"
-              justifyContent="space-between"
-              flexWrap="wrap"
-            >
-              <Typography id="modal-task-title" variant="h3">
-                {selectedTask?.title}
-              </Typography>
-              {selectedTask && (
-                <Typography component="time" color="text.secondary">
-                  {format(
-                    new Date(selectedTask.datetime),
-                    "iiii, do MMMM, HH:mm"
-                  )}
-                </Typography>
-              )}
-            </Box>
-            <Divider sx={{ marginTop: 1, marginBottom: 2 }} />
-            <Typography id="modal-task-description">
-              {selectedTask?.description
-                ? selectedTask.description
-                : "No description"}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Modal>
+      />
       <CalendarWrapper>
         <CalendarGrid>
           <CalendarHeader component="header">
