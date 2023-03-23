@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { logout } from "../auth/auth.slice";
 import RequireAuth from "../auth/RequireAuth";
 import FolderList from "../folders/FolderList";
+import {fetchFolders} from "../folders/folders.slice";
 import MonthPicker from "../month-picker/MonthPicker";
 import NewTaskForm from "../tasks/NewTaskForm";
 import TasksWrapper from "../tasks/TasksWrapper";
@@ -31,10 +32,14 @@ const Layout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useAppDispatch();
-  const first_name = useAppSelector((state) => state.auth.user?.first_name);
+  const firstName = useAppSelector((state) => state.auth.user?.first_name);
   const { drawers } = useAppSelector((state) => state.layout);
   const navigate = useNavigate();
   const didRenderRef = useRef(false);
+
+  useEffect(() => {
+    dispatch(fetchFolders({ sort: "name" }));
+  }, [dispatch]);
 
   // On initial render, redirect to agenda view if on small screen
   useEffect(() => {
@@ -65,7 +70,7 @@ const Layout = () => {
             GoToDo
           </Typography>
           <Button sx={{ color: "#fff" }} onClick={() => dispatch(logout())}>
-            Logout {first_name}
+            Logout {firstName}
           </Button>
         </Toolbar>
       </AppBar>
