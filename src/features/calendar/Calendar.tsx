@@ -55,7 +55,7 @@ const CalendarGrid = styled(Box)(() => ({
   paddingBottom: 1,
 }));
 
-const CalendarHeader = styled(Box)(({ theme }) => ({
+const CalendarHeader = styled("header")(({ theme }) => ({
   position: "sticky",
   top: 0,
   gridColumn: "span 7",
@@ -122,7 +122,7 @@ const Calendar = () => {
       />
       <CalendarWrapper>
         <CalendarGrid>
-          <CalendarHeader component="header">
+          <CalendarHeader>
             {DAYS.map((day) => (
               <Box
                 key={day}

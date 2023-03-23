@@ -40,7 +40,7 @@ const CalendarDay = ({
     <Box
       sx={(theme) => ({
         padding: "0 8px 8px 8px",
-        border: isToday ? "1px solid red" : "",
+        border: isToday ? `1px solid ${theme.palette.error.main}` : "",
         backgroundColor: isCurrMonth
           ? theme.palette.background.paper
           : "#f1f1f1",
